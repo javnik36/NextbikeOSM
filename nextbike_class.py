@@ -20,6 +20,10 @@ class City:
     def __str__(self):
         return "#" + str(self.uid) + " @" + self.name + " with " + str(len(self.places)) + " places."
 
+    def get(self, nr):
+        if self.uid == nr:
+            return self.places        
+
 class Country:
     def __init__(self, name, country, cities=None):
         self.name = name

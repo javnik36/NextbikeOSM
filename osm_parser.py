@@ -51,3 +51,35 @@ class osmParser:
 
     def __str__(self):
         return "Found " + str(len(self.nodes)) + " nodes and " + str(len(self.ways)) + " ways."
+
+    def find_node(self, iD):
+        '''Returns data from iD searched'''
+        for i in self.nodes:
+            if i.iD == iD:
+                return i
+
+    def fill_ways(self):
+        '''Can be done in OSM processing class?'''
+        temp = []
+        for way in self.ways:
+            for node in way.nodes:
+                print(node)
+                p = self.find_node(node)
+                print(p)
+
+                node = (p.lat, p.lon)
+                print(node)
+            print(way)
+
+    def dumb_nodes(self):
+        print("DUMBING ALL NODES:................")
+        for i in self.nodes:
+            print(i)
+            print("ID:   " + i.iD + ";LAT:   " + i.lat + ";LON:   " + i.lon)# + ";TAGS:   " + print(key, value) for key, value in i.tags.items())
+        print("DUMBED NODES#")
+
+    def dumb_ways(self):
+        print("DUMBING ALL WAYS:................")
+        for i in self.ways:
+            print(i)
+        print("DUMBED WAYS#")
