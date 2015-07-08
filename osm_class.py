@@ -3,7 +3,7 @@ class Node:
         self.iD = iD
         self.lat = lat
         self.lon = lon
-        self.tags = {}
+        self.tags = tags #[]
 
     def __str__(self):
         return str(self.iD)+ " @lat: " + str(self.lat) + " @lon: " + str(self.lon) + " $tags " + str(len(self.tags))
@@ -11,9 +11,12 @@ class Node:
 class Way:
     def __init__(self, iD, nodes, tags, fake_node=None):
         self.iD = iD
-        self.nodes = []
-        self.tags = {}
+        self.nodes = nodes #[]
+        self.tags = tags #{}
         self.fake_node = None
+
+    def __str__(self):
+        return str(self.iD) + " $points " + str(len(self.nodes)) + " $tags " + str(len(self.tags))
 
     def fill(self, node_s):
         '''Can be done in OSM processing class?'''
