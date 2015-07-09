@@ -19,18 +19,18 @@ class osmParser:
                 lon = child.attrib["lon"]
                 tags = {}
 
-                if len(list(child)) != 0:
-                    for tag in child:
-                        if tag.attrib["k"] == "amenity":
-                            pass
-                        elif tag.attrib["k"] in ["capacity", "name", "network", "operator", "ref", "website", "source"]:
-                            k = tag.attrib["k"]
-                            v = tag.attrib["v"]
-                            tags[k] = v
-                    c = OC.Node(iD, lat, lon, tags)
-                    nodes_list.append(c)
-                else:
-                    break
+                # if len(list(child)) != 0:
+                for tag in child:
+                    if tag.attrib["k"] == "amenity":
+                        pass
+                    elif tag.attrib["k"] in ["capacity", "name", "network", "operator", "ref", "website", "source"]:
+                        k = tag.attrib["k"]
+                        v = tag.attrib["v"]
+                        tags[k] = v
+                c = OC.Node(iD, lat, lon, tags)
+                nodes_list.append(c)
+                # else:
+                #     break
 
             elif child.tag == "way":
                 iD = child.attrib["id"]
@@ -62,23 +62,31 @@ class osmParser:
             if i.iD == iD:
                 return i
 
-    def fill_ways(self):
-        '''Can be done in OSM processing class?'''
-        temp = []
-        for way in self.ways:
-            for node in way.nodes:
-                print(node)
-                p = self.find_node(node)
-                print(p)
+    def clear_nodes(self):
+        new_nodes = []
+        for i in self.nodes:
+            if len(i.tags) == 0:
+                pass
+            else:
+                new_nodes.append(i)
+        self.nodes = new_nodes
 
+    def fill_ways(self):
+        '''Fills up ways with data from nodes'''
+        for way in self.ways:
+            new_nodes = []
+            for node in way.nodes:
+                p = self.find_node(node)
                 node = (p.lat, p.lon)
-                print(node)
-            print(way)
+                new_nodes.append(node)
+            way.nodes = new_nodes
 
     def fake_all(self):
         '''Run fake_it for all ways in Class'''
         for way in self.ways:
             way.fake_it()
+            fi = way.fake_instance()
+            self.nodes.append(fi)
 
     def dumb_nodes(self):
         print("DUMBING ALL NODES:................")

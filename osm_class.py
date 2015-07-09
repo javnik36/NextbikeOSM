@@ -40,3 +40,6 @@ class Way:
         x_s = s.mean([float(max(x)), float(min(x))])
         self.fake_node = (y_s, x_s)
         return y_s, x_s
+
+    def fake_instance(self):
+        return Node(self.iD, self.fake_node[0], self.fake_node[1], '?')
