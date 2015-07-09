@@ -8,7 +8,6 @@ class NextbikeValidator:
         self.pair_bank = []
         self.html = html
 
-
     def measure(self, point_next, point_osm):
         import math as m
         lat_next = float(point_next.lat)

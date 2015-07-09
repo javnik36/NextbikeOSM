@@ -18,16 +18,20 @@ class osmParser:
                 lat = child.attrib["lat"]
                 lon = child.attrib["lon"]
                 tags = {}
-                for tag in child:
-                    if tag.attrib["k"] == "amenity":
-                        pass
-                    elif tag.attrib["k"] in ["capacity", "name", "network", "operator", "ref", "website", "source"]:
-                        k = tag.attrib["k"]
-                        v = tag.attrib["v"]
-                        tags[k] = v
 
-                c = OC.Node(iD, lat, lon, tags)
-                nodes_list.append(c)
+                if len(list(child)) != 0:
+                    for tag in child:
+                        if tag.attrib["k"] == "amenity":
+                            pass
+                        elif tag.attrib["k"] in ["capacity", "name", "network", "operator", "ref", "website", "source"]:
+                            k = tag.attrib["k"]
+                            v = tag.attrib["v"]
+                            tags[k] = v
+                    c = OC.Node(iD, lat, lon, tags)
+                    nodes_list.append(c)
+                else:
+                    break
+
             elif child.tag == "way":
                 iD = child.attrib["id"]
                 nodes = []
