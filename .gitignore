@@ -1,4 +1,5 @@
 *.xml
 *.osm
 *.txt
+*.html
 /__pycache__

@@ -36,7 +36,7 @@ class Way:
             y.append(i[0])
             x.append(i[1])
 
-        y_s = s.mean(max(y), min(y))
-        x_s = s.mean(max(x), min(x))
+        y_s = s.mean([float(max(y)), float(min(y))])
+        x_s = s.mean([float(max(x)), float(min(x))])
         self.fake_node = (y_s, x_s)
         return y_s, x_s

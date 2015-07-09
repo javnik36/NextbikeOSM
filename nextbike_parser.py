@@ -58,3 +58,10 @@ class NextbikeParser:
             C_list.append(C)
         self.countrys = C_list
         #self.countrys = []
+
+    def find(self, name):
+        for i in self.countrys:
+            if i.name == name:
+                d = i.cities[0]
+                e = d.places
+                return e

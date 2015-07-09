@@ -71,6 +71,11 @@ class osmParser:
                 print(node)
             print(way)
 
+    def fake_all(self):
+        '''Run fake_it for all ways in Class'''
+        for way in self.ways:
+            way.fake_it()
+
     def dumb_nodes(self):
         print("DUMBING ALL NODES:................")
         for i in self.nodes:
