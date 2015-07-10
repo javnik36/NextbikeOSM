@@ -4,7 +4,10 @@ class NextbikeParser:
     def __init__(self, countrys=None):
         import xml.etree.ElementTree as XML
         import nextbike_class as NC
+        import urllib.request as urllib
 
+        path = "https://nextbike.net/maps/nextbike-live.xml"
+        urllib.urlretrieve(path, "nextbike.xml")
         plik = XML.parse("nextbike.xml")
         root = plik.getroot()
 
@@ -58,6 +61,10 @@ class NextbikeParser:
             C_list.append(C)
         self.countrys = C_list
         #self.countrys = []
+
+    def __str__(self):
+        for i in self.countrys:
+            print(i.name)
 
     def find(self, name):
         for i in self.countrys:

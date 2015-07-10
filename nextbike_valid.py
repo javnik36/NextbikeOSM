@@ -15,12 +15,6 @@ class NextbikeValidator:
         lat_osm = float(point_osm.lat)
         lon_osm = float(point_osm.lon)
 
-        #test field
-        # lat_next = float(52.28584837775539)
-        # lon_next = float(20.940569043159485)
-        # lat_osm = float(52.2858671)
-        # lon_osm = float(20.9405856)
-
         R = 6378.41
         #Haversine formula
         dist = 2*R* m.asin( m.sqrt( (m.sin(m.radians(0.5*(lat_next-lat_osm))))**2 + m.cos(m.radians(lat_osm))*m.cos(m.radians(lat_next))*(m.sin(m.radians(0.5*(lon_next-lon_osm))))**2 )) #in KM
@@ -107,16 +101,11 @@ class NextbikeValidator:
                 self.html += "BRAK" + en + K
         self.html += '''</table>\n</body>\n</html>'''
 
-    def save_it(self, nazwa):
+    def save_it(self, nazwa="nextbikeOSM_results.html"):
         plik = open(nazwa, 'w')
         save = plik.write(self.html)
         plik.close()
 
-
-
-
-    # def tagging(self):
-            # def
             ##NEXT vs osm
             # uid  !=     iD
             # lat         lat
@@ -125,14 +114,49 @@ class NextbikeValidator:
             # num         ref {tags}
             # stands      capacity {tags}++
 
+if __name__ == "__main__":
+    import sys
+    try:
+        if sys.argv[1] == "-a":
+            path_osm = sys.argv[2]
+            place = sys.argv[3]
+            html = sys.argv[4]
 
-a = OP.osmParser()
-a.fill_ways()
-a.clear_nodes()
-a.fake_all()
-b = NP.NextbikeParser()
-c = NextbikeValidator(b,a)
-d = b.find("VETURILO Poland")
-c.pair_it(d)
-c.html_it()
-c.save_it("RESUME.html")
+            a = OP.osmParser(path_osm)
+            a.fill_ways()
+            a.clear_nodes()
+            a.fake_all()
+            b = NP.NextbikeParser()
+            c = NextbikeValidator(b,a)
+            d = b.find(place)
+            c.pair_it(d)
+            c.html_it()
+            c.save_it(html)
+        elif sys.argv[1] == "-d":
+            a = OP.osmParser()
+            a.fill_ways()
+            a.clear_nodes()
+            a.fake_all()
+            b = NP.NextbikeParser()
+            c = NextbikeValidator(b,a)
+            d = b.find("VETURILO Poland")
+            c.pair_it(d)
+            c.html_it()
+            c.save_it("RESUME.html")
+    except:
+        path_osm = input("Write path to osm file:\n")
+        a = OP.osmParser(path_osm)
+        a.fill_ways()
+        a.clear_nodes()
+        a.fake_all()
+        b = NP.NextbikeParser()
+        print("PLACES TO CHOOSE FROM:")
+        print(b)
+        place = input("What kind of network should I process?\n")
+        c = NextbikeValidator(b,a)
+        d = b.find(place)
+        c.pair_it(d)
+        c.html_it()
+        html = input("HTML name? (if you type nothing then will be taken default name)")
+        c.save_it(html)
+        print("All done...thanks!")

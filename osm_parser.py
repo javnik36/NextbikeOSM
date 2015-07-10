@@ -1,10 +1,11 @@
 class osmParser:
 
-    def __init__(self, nodes=None, ways=None):
+    def __init__(self, path="export.osm", nodes=None, ways=None):
+        self.path = path
         import xml.etree.ElementTree as XML
         import osm_class as OC
 
-        plik = XML.parse("export.osm")
+        plik = XML.parse(self.path)
         root = plik.getroot()
 
         nodes_list = []
