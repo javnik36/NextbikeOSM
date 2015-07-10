@@ -56,11 +56,18 @@ class osmParser:
     def __str__(self):
         return "Found " + str(len(self.nodes)) + " nodes and " + str(len(self.ways)) + " ways."
 
-    def find_node(self, iD):
+    def find(self, iD, mode='n'):
         '''Returns data from iD searched'''
-        for i in self.nodes:
-            if i.iD == iD:
-                return i
+        if mode == 'n':
+            for i in self.nodes:
+                if i.iD == iD:
+                    return i
+        elif mode == 'w':
+            for i in self.ways:
+                if i.iD == iD:
+                    return i
+        else:
+            raise ValueError
 
     def clear_nodes(self):
         new_nodes = []
@@ -76,7 +83,7 @@ class osmParser:
         for way in self.ways:
             new_nodes = []
             for node in way.nodes:
-                p = self.find_node(node)
+                p = self.find(node)
                 node = (p.lat, p.lon)
                 new_nodes.append(node)
             way.nodes = new_nodes

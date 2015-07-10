@@ -41,7 +41,11 @@ class NextbikeValidator:
                 elif meas > dist:
                     continue
 
-            d1 = (dist, i, nearest)
+            fway = self.osm_data.find(nearest.iD, 'w')
+            if fway != None:
+                d1 = (dist, i, fway, 'w')
+            else:
+                d1 = (dist, i, nearest)
             dane.append(d1)
 
         self.pair_bank = dane
@@ -73,11 +77,15 @@ class NextbikeValidator:
             K = "</tr>\n"
             st = "<td>\n"
             en = "</td>\n"
-            mapa1 = '<a href="http://www.openstreetmap.org/node/{uid}">{uid}</a>'
-            mapa2 = '<a href="http://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map=19/{lat}/{lon}">{uid}</a>'
             dist = i[0]
             nextb = i[1]
             osm = i[2]
+            if i[-1] == 'w':
+                mapa1 = '<a href="http://www.openstreetmap.org/way/{uid}">{uid}</a>'
+            else:
+                mapa1 = '<a href="http://www.openstreetmap.org/node/{uid}">{uid}</a>'
+            mapa2 = '<a href="http://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map=19/{lat}/{lon}">{uid}</a>'
+
             self.html += P + st
             self.html += mapa2.format(lat=nextb.lat, lon=nextb.lon, uid=nextb.uid) + en + st
             self.html += mapa1.format(uid=osm.iD) + en + st
@@ -119,6 +127,9 @@ class NextbikeValidator:
 
 
 a = OP.osmParser()
+a.fill_ways()
+a.clear_nodes()
+a.fake_all()
 b = NP.NextbikeParser()
 c = NextbikeValidator(b,a)
 d = b.find("VETURILO Poland")
