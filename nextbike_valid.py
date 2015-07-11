@@ -46,13 +46,34 @@ class NextbikeValidator:
         # return dane
 
     def html_it(self):
+        import difflib as SC
         self.html = '''<html>\n
         <body>\n
+        <style>
+            table{
+                border: 1px solid black;
+                border-collapse: collapse;
+            }
+            th{
+                text-align: center;
+                vertical-align: center;
+                border: 1px solid black;
+            }
+            td, tr{
+                border: 1px solid black;
+            }
+            .fill{
+                background-color: #D4D4D4;
+            }
+            .red{
+                background-color: #FF8080;
+            }
+            </style>
         <table>\n
             <tr>\n
-                <th rowspan="2">NextBike uid</th>\n
-                <th rowspan="2">OSM id(closed match)</th>\n
-                <th rowspan="2">Distance(in meters)</th>\n
+                <th rowspan="2">NextBike<br>uid</th>\n
+                <th rowspan="2">OSM id<br>(closest match)</th>\n
+                <th rowspan="2">Distance<br>(in meters)</th>\n
                 <th colspan="2">Name</th>\n
                 <th colspan="2">Ref</th>\n
                 <th colspan="2">Stands</th>\n
@@ -66,11 +87,8 @@ class NextbikeValidator:
                 <th>osm</th>\n
             </tr>\n
             '''
+        counter = 1
         for i in self.pair_bank:
-            P = "<tr>\n"
-            K = "</tr>\n"
-            st = "<td>\n"
-            en = "</td>\n"
             dist = i[0]
             nextb = i[1]
             osm = i[2]
@@ -79,27 +97,54 @@ class NextbikeValidator:
             else:
                 mapa1 = '<a href="http://www.openstreetmap.org/node/{uid}">{uid}</a>'
             mapa2 = '<a href="http://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map=19/{lat}/{lon}">{uid}</a>'
+            stry = "<td class='red'>"
 
-            self.html += P + st
-            self.html += mapa2.format(lat=nextb.lat, lon=nextb.lon, uid=nextb.uid) + en + st
-            self.html += mapa1.format(uid=osm.iD) + en + st
-            self.html += str(dist) + en + st
-            self.html += nextb.name + en + st
+            if counter%2 != 0:
+                P = "<tr>\n"
+                K = "</tr>\n"
+                st = "<td class='fill'>\n"
+                en = "</td>\n"
+            else:
+                P = "<tr>\n"
+                K = "</tr>\n"
+                st = "<td>\n"
+                en = "</td>\n"
+
+            counter += 1
+            self.html += P
+            self.html += st + mapa2.format(lat=nextb.lat, lon=nextb.lon, uid=nextb.uid) + en
+            self.html += st + mapa1.format(uid=osm.iD) + en
+            if dist > 50:
+                self.html += stry + str(dist) + en
+            else:
+                self.html += st + str(dist) + en
+            self.html += st + nextb.name + en
             try:
-                self.html += osm.tags.get("name") + en + st
+                prob = SC.SequenceMatcher(None, nextb.name, osm.tags.get("name")).ratio()
+                if prob <= 0.8:
+                    self.html += stry + osm.tags.get("name") + en
+                else:
+                    self.html += st + osm.tags.get("name") + en
             except:
-                self.html += "BRAK" + en + st
-            self.html += nextb.num + en + st
+                self.html += stry + "BRAK" + en
+            self.html += st + str(nextb.num) + en
             try:
-                self.html += osm.tags.get("ref") + en + st
+                if int(nextb.num) == int(osm.tags.get("ref")):
+                    self.html += st + osm.tags.get("ref") + en
+                else:
+                    self.html += stry + osm.tags.get("ref") + en
             except:
-                self.html += "BRAK" + en + st
-            self.html += nextb.stands + en + st
+                self.html += stry + "BRAK" + en
+            self.html += st + nextb.stands + en
             try:
-                self.html += osm.tags.get("capacity") + en + K
+                if int(osm.tags.get("capacity")) == int(nextb.stands):
+                    self.html += st + osm.tags.get("capacity") + en + K
+                else:
+                    self.html += stry + osm.tags.get("capacity") + en + K
             except:
-                self.html += "BRAK" + en + K
+                self.html += stry + "BRAK" + en + K
         self.html += '''</table>\n</body>\n</html>'''
+
 
     def save_it(self, nazwa="nextbikeOSM_results.html"):
         plik = open(nazwa, 'w')
@@ -143,6 +188,10 @@ if __name__ == "__main__":
             c.pair_it(d)
             c.html_it()
             c.save_it("RESUME.html")
+        elif sys.argv[1] == "help":
+            print("python nextbike_valid.py -a osm_path network_name html_path")
+            print("python nextbike_valid.py : guide for anyone")
+            print("python nextbike_valid.py -d : default for debugging")
     except:
         path_osm = input("Write path to osm file:\n")
         a = OP.osmParser(path_osm)
@@ -150,7 +199,7 @@ if __name__ == "__main__":
         a.clear_nodes()
         a.fake_all()
         b = NP.NextbikeParser()
-        print("PLACES TO CHOOSE FROM:")
+        print("NETWORKS TO CHOOSE FROM:")
         print(b)
         place = input("What kind of network should I process?\n")
         c = NextbikeValidator(b,a)
