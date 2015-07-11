@@ -64,7 +64,7 @@ class NextbikeParser:
 
     def __str__(self):
         for i in self.countrys:
-            print(i.name)
+            return i.name
 
     def find(self, name):
         for i in self.countrys:
