@@ -131,7 +131,7 @@ class NextbikeValidator:
                 else:
                     self.html += st + osm.tags.get("name") + en
             except:
-                self.html += stry + "BRAK" + en
+                self.html += stry + "NONE" + en
             self.html += st + str(nextb.num) + en
             try:
                 if int(nextb.num) == int(osm.tags.get("ref")):
@@ -139,7 +139,7 @@ class NextbikeValidator:
                 else:
                     self.html += stry + osm.tags.get("ref") + en
             except:
-                self.html += stry + "BRAK" + en
+                self.html += stry + "NONE" + en
             self.html += st + nextb.stands + en
             try:
                 if int(osm.tags.get("capacity")) == int(nextb.stands):
@@ -147,7 +147,7 @@ class NextbikeValidator:
                 else:
                     self.html += stry + osm.tags.get("capacity") + en + K
             except:
-                self.html += stry + "BRAK" + en + K
+                self.html += stry + "NONE" + en + K
         self.html += '''</table>\n</body>\n</html>'''
 
     def save_it(self, nazwa="nextbikeOSM_results.html"):
