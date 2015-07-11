@@ -1,18 +1,21 @@
 class Node:
+
     def __init__(self, iD, lat, lon, tags):
         self.iD = iD
         self.lat = lat
         self.lon = lon
-        self.tags = tags #[]
+        self.tags = tags  # []
 
     def __str__(self):
-        return str(self.iD)+ " @lat: " + str(self.lat) + " @lon: " + str(self.lon) + " $tags " + str(len(self.tags))
+        return str(self.iD) + " @lat: " + str(self.lat) + " @lon: " + str(self.lon) + " $tags " + str(len(self.tags))
+
 
 class Way:
+
     def __init__(self, iD, nodes, tags, fake_node=None):
         self.iD = iD
-        self.nodes = nodes #[]
-        self.tags = tags #{}
+        self.nodes = nodes  # []
+        self.tags = tags  # {}
         self.fake_node = None
 
     def __str__(self):
@@ -24,7 +27,7 @@ class Way:
         for point in self.nodes:
             for obj in node_s:
                 if obj.iD == point:
-                    temp.append( (obj.lat,obj.lon) )
+                    temp.append((obj.lat, obj.lon))
         self.nodes = temp
 
     def fake_it(self):

@@ -41,12 +41,12 @@ class osmParser:
                     if instance.tag == "nd":
                         nodes.append(instance.attrib["ref"])
                     else:
-                         if instance.attrib["k"] == "amenity":
-                             pass
-                         elif instance.attrib["k"] in ["capacity", "name", "network", "operator", "ref", "website", "source"]:
-                             k = instance.attrib["k"]
-                             v = instance.attrib["v"]
-                             tags[k] = v
+                        if instance.attrib["k"] == "amenity":
+                            pass
+                        elif instance.attrib["k"] in ["capacity", "name", "network", "operator", "ref", "website", "source"]:
+                            k = instance.attrib["k"]
+                            v = instance.attrib["v"]
+                            tags[k] = v
 
                 w = OC.Way(iD, nodes, tags)
                 ways_list.append(w)
@@ -100,7 +100,8 @@ class osmParser:
         print("DUMBING ALL NODES:................")
         for i in self.nodes:
             print(i)
-            print("ID:   " + i.iD + ";LAT:   " + i.lat + ";LON:   " + i.lon)# + ";TAGS:   " + print(key, value) for key, value in i.tags.items())
+            # + ";TAGS:   " + print(key, value) for key, value in i.tags.items())
+            print("ID:   " + i.iD + ";LAT:   " + i.lat + ";LON:   " + i.lon)
         print("DUMBED NODES#")
 
     def dumb_ways(self):

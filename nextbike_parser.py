@@ -1,4 +1,5 @@
 class NextbikeParser:
+
     '''Aggregates Nextbike country Classes'''
 
     def __init__(self, countrys=None):
@@ -44,7 +45,8 @@ class NextbikeParser:
                             bike_stands = "!"
                         try:
                             bike_nrs = place.attrib["bike_numbers"]
-                            n = NC.Place(uid, lat, lon, name, num, bike_stands, bike_nrs)
+                            n = NC.Place(
+                                uid, lat, lon, name, num, bike_stands, bike_nrs)
                         except:
                             n = NC.Place(uid, lat, lon, name, num, bike_stands)
 
