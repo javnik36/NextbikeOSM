@@ -27,6 +27,9 @@ class City:
         if self.uid == nr:
             return self.places
 
+    def get_uid(self):
+        return self.uid
+
 
 class Country:
 

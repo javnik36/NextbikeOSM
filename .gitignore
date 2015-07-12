@@ -3,3 +3,4 @@
 *.txt
 *.html
 /__pycache__
+debug.py

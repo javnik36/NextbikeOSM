@@ -62,7 +62,7 @@ class NextbikeParser:
             C.cities = cities_list
             C_list.append(C)
         self.countrys = C_list
-        #self.countrys = []
+        # self.countrys = []
 
     def __str__(self):
         for i in self.countrys:
@@ -74,3 +74,18 @@ class NextbikeParser:
                 d = i.cities[0]
                 e = d.places
                 return e
+
+    def get_uids(self):
+        temp = []
+        for c in self.countrys:
+            p = c.name
+            temp.append("_______________")
+            temp.append(p)
+            for ci in c.cities:
+                a = ci.get_uid()
+                b = str(ci.name)
+                c = a + ' ' + b
+                temp.append(c)
+
+        for i in temp:
+            print(str(i))
