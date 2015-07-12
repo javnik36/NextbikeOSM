@@ -55,7 +55,7 @@ class NextbikeValidator:
     def html_it(self):
         '''Produces html with processing data.'''
         import difflib as SC
-        self.html = '''<html>\n
+        self.html = '''<html>\n<head><meta charset="UTF-8"></head>\n
         <body>\n
         <style>
             table{
@@ -157,7 +157,7 @@ class NextbikeValidator:
 
     def save_it(self, nazwa="nextbikeOSM_results.html"):
         '''Saves html from self.html to file'''
-        plik = open(nazwa, 'w')
+        plik = open(nazwa, 'w', encoding="utf-8")
         save = plik.write(self.html)
         plik.close()
 
