@@ -6,9 +6,14 @@ class NextbikeParser:
         import xml.etree.ElementTree as XML
         import nextbike_class as NC
         import urllib.request as urllib
+        import os
 
         path = "https://nextbike.net/maps/nextbike-live.xml"
-        urllib.urlretrieve(path, "nextbike.xml")
+        if "nextbike.xml" in os.listdir():
+            pass
+        else:
+            urllib.urlretrieve(path, "nextbike.xml")
+
         plik = XML.parse("nextbike.xml")
         root = plik.getroot()
 
@@ -87,5 +92,16 @@ class NextbikeParser:
                 c = a + ' ' + b
                 temp.append(c)
 
+        plik = open("nextbike_uids.txt", 'w', encoding="utf-8")
+        plik.write("Network\nuid<<>>city name\n")
         for i in temp:
             print(str(i))
+            plik.write(str(i) + '\n')
+        plik.close()
+
+    @staticmethod
+    def update():
+        '''Updates xml manually'''
+        import urllib.request as urllib
+        path = "https://nextbike.net/maps/nextbike-live.xml"
+        urllib.urlretrieve(path, "nextbike.xml")

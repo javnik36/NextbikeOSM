@@ -166,9 +166,25 @@ class NextbikeValidator:
 if __name__ == "__main__":
     import sys
     try:
-        if sys.argv[1] == "-a":
-            path_osm = sys.argv[2]
+        if sys.argv[1] == "-a" and sys.argv[2] == "-u":
             place = sys.argv[3]
+            path_osm = sys.argv[4]
+            html = sys.argv[5]
+
+            a = OP.osmParser(path_osm)
+            a.fill_ways()
+            a.clear_nodes()
+            a.fake_all()
+            NP.NextbikeParser.update()
+            b = NP.NextbikeParser()
+            c = NextbikeValidator(b, a)
+            d = b.find(place)
+            c.pair_it(d)
+            c.html_it()
+            c.save_it(html)
+        elif sys.argv[1] == "-a":
+            place = sys.argv[2]
+            path_osm = sys.argv[3]
             html = sys.argv[4]
 
             a = OP.osmParser(path_osm)
@@ -192,11 +208,14 @@ if __name__ == "__main__":
             c.pair_it(d)
             c.html_it()
             c.save_it("RESUME.html")
+        elif sys.argv[1] == "-u":
+            NP.NextbikeParser.update()
         elif sys.argv[1] == "help":
             print(
-                "python nextbike_valid.py -a osm_path network_name html_path")
+                "python nextbike_valid.py -a (-u) network_name osm_path html_path")
             print("python nextbike_valid.py : guide for anyone")
             print("python nextbike_valid.py -d : default for debugging")
+            print("python nextbike_valid.py -u : updates xml manually")
     except:
         path_osm = input("Write path to osm file:\n")
         a = OP.osmParser(path_osm)
