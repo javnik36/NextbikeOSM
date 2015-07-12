@@ -73,14 +73,23 @@ class NextbikeParser:
         for i in self.countrys:
             return i.name
 
-    def find(self, name):
+    def find_network(self, name):
+        db = []
         for i in self.countrys:
             if i.name == name:
-                d = i.cities[0]
-                e = d.places
-                return e
+                for city in i.cities:
+                    e = city.places
+                    db += e
+        return db
 
-    def get_uids(self):
+    def find_city(self, name):
+        for i in self.countrys:
+            for city in i.cities:
+                if city.uid == str(name):
+                    e = city.places
+                    return e
+
+    def get_uids(self, cons="n"):
         temp = []
         for c in self.countrys:
             p = c.name
@@ -95,7 +104,8 @@ class NextbikeParser:
         plik = open("nextbike_uids.txt", 'w', encoding="utf-8")
         plik.write("Network\nuid<<>>city name\n")
         for i in temp:
-            print(str(i))
+            if cons == "y":
+                print(str(i))
             plik.write(str(i) + '\n')
         plik.close()
 

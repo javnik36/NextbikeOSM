@@ -177,8 +177,12 @@ if __name__ == "__main__":
             a.fake_all()
             NP.NextbikeParser.update()
             b = NP.NextbikeParser()
+            b.get_uids()
             c = NextbikeValidator(b, a)
-            d = b.find(place)
+            if place.isnumeric():
+                d = b.find_city(place)
+            else:
+                d = b.find_network(place)
             c.pair_it(d)
             c.html_it()
             c.save_it(html)
@@ -192,8 +196,12 @@ if __name__ == "__main__":
             a.clear_nodes()
             a.fake_all()
             b = NP.NextbikeParser()
+            b.get_uids()
             c = NextbikeValidator(b, a)
-            d = b.find(place)
+            if place.isnumeric():
+                d = b.find_city(place)
+            else:
+                d = b.find_network(place)
             c.pair_it(d)
             c.html_it()
             c.save_it(html)
@@ -203,8 +211,9 @@ if __name__ == "__main__":
             a.clear_nodes()
             a.fake_all()
             b = NP.NextbikeParser()
+            b.get_uids()
             c = NextbikeValidator(b, a)
-            d = b.find("VETURILO Poland")
+            d = b.find_network("VETURILO Poland")
             c.pair_it(d)
             c.html_it()
             c.save_it("RESUME.html")
@@ -223,14 +232,16 @@ if __name__ == "__main__":
         a.clear_nodes()
         a.fake_all()
         b = NP.NextbikeParser()
-        print("NETWORKS TO CHOOSE FROM:")
-        print(b)
-        place = input("What kind of network should I process?\n")
+        b.get_uids()
+        place = input(
+            "______________\nWhat kind of network\city should I process?\n>If you want particular city please write it's uid number from nextbike_uids.txt\n>>For whole network write it's name(within ''), also from nextbike_uids.txt\n")
         c = NextbikeValidator(b, a)
-        d = b.find(place)
+        if place.isnumeric():
+            d = b.find_city(place)
+        else:
+            d = b.find_network(place)
         c.pair_it(d)
         c.html_it()
-        html = input(
-            "HTML name? (if you type nothing then will be taken default name)")
+        html = input("______________\nHTML name?")
         c.save_it(html)
-        print("All done...thanks!")
+        print("______________\nAll done...thanks!")
