@@ -43,7 +43,7 @@ python nextbike_valid.py -a "VETURILO Poland" export.osm my.html
 ```
 python nextbike_valid.py -a 43 export.osm my.html
 ```
-* Updates data from nextbike server
+* Updates data from nextbike server. This data are downloaded by first run automatically, but if you want to keep it updated, this it for you.
 ```
 python nextbike_valid.py -u
 ```

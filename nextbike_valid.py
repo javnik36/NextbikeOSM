@@ -4,6 +4,8 @@ import nextbike_parser as NP
 
 class NextbikeValidator:
 
+    '''Analyzer class'''
+
     def __init__(self, next_data, osm_data, pair_bank=None, html=None):
         self.next_data = next_data
         self.osm_data = osm_data
@@ -11,6 +13,7 @@ class NextbikeValidator:
         self.html = html
 
     def measure(self, point_next, point_osm):
+        '''Measures distance between 2 points with Haversine formula.'''
         import math as m
         lat_next = float(point_next.lat)
         lon_next = float(point_next.lon)
@@ -25,6 +28,7 @@ class NextbikeValidator:
         return dist_m
 
     def pair_it(self, next_places):
+        '''Makes pair of OSM and Nexbike features by they's distance.'''
         # input: list of next_places from city & osm
         dane = []
         for i in next_places:
@@ -49,6 +53,7 @@ class NextbikeValidator:
         # return dane
 
     def html_it(self):
+        '''Produces html with processing data.'''
         import difflib as SC
         self.html = '''<html>\n
         <body>\n
@@ -151,6 +156,7 @@ class NextbikeValidator:
         self.html += '''</table>\n</body>\n</html>'''
 
     def save_it(self, nazwa="nextbikeOSM_results.html"):
+        '''Saves html from self.html to file'''
         plik = open(nazwa, 'w')
         save = plik.write(self.html)
         plik.close()

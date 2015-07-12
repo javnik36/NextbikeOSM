@@ -74,6 +74,7 @@ class NextbikeParser:
             return i.name
 
     def find_network(self, name):
+        '''Returns data for whole network'''
         db = []
         for i in self.countrys:
             if i.name == name:
@@ -83,6 +84,7 @@ class NextbikeParser:
         return db
 
     def find_city(self, name):
+        '''Returns data for city only'''
         for i in self.countrys:
             for city in i.cities:
                 if city.uid == str(name):
@@ -90,6 +92,7 @@ class NextbikeParser:
                     return e
 
     def get_uids(self, cons="n"):
+        '''Makes file with all uids from xml-file. If cons='y' it's print it to console too.'''
         temp = []
         for c in self.countrys:
             p = c.name
