@@ -8,7 +8,7 @@ class NextbikeParser:
         import urllib.request as urllib
         import os
 
-        path = "https://nextbike.net/maps/nextbike-live.xml"
+        path = "http://nextbike.net/maps/nextbike-official.xml"
         if "nextbike.xml" in os.listdir():
             pass
         else:

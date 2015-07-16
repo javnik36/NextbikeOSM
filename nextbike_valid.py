@@ -248,6 +248,6 @@ if __name__ == "__main__":
             d = b.find_network(place)
         c.pair_it(d)
         c.html_it()
-        html = input("______________\nHTML name?")
+        html = input("______________\nHTML name?\n")
         c.save_it(html)
         print("______________\nAll done...thanks!")
