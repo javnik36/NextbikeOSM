@@ -85,6 +85,8 @@ class NextbikeValidator:
                 <th colspan="2">Name</th>\n
                 <th colspan="2">Ref</th>\n
                 <th colspan="2">Stands</th>\n
+                <th rowspan="2">Network</th>\n
+                <th rowspan="2">Operator</th>\n
             </tr>\n
             <tr>\n
                 <th>nextbike</th>\n
@@ -148,9 +150,17 @@ class NextbikeValidator:
             self.html += st + nextb.stands + en
             try:
                 if int(osm.tags.get("capacity")) == int(nextb.stands):
-                    self.html += st + osm.tags.get("capacity") + en + K
+                    self.html += st + osm.tags.get("capacity") + en
                 else:
-                    self.html += stry + osm.tags.get("capacity") + en + K
+                    self.html += stry + osm.tags.get("capacity") + en
+            except:
+                self.html += stry + "NONE" + en
+            try:
+                self.html += st + osm.tags.get("network") + en
+            except:
+                self.html += stry + "NONE" + en
+            try:
+                self.html += st + osm.tags.get("operator") + en + K
             except:
                 self.html += stry + "NONE" + en + K
         self.html += '''</table>\n</body>\n</html>'''
