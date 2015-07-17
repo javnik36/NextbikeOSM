@@ -1,9 +1,49 @@
+class Node:
+
+    def __init__(self, iD, lat, lon, tags):
+        self.iD = iD
+        self.lat = lat
+        self.lon = lon
+        self.tags = tags  # []
+
+    def __str__(self):
+        return str(self.iD) + " @lat: " + str(self.lat) + " @lon: " + str(self.lon) + " $tags " + str(len(self.tags))
+
+
+class Way:
+
+    def __init__(self, iD, nodes, tags, fake_node=None):
+        self.iD = iD
+        self.nodes = nodes  # []
+        self.tags = tags  # {}
+        self.fake_node = None
+
+    def __str__(self):
+        return str(self.iD) + " $points " + str(len(self.nodes)) + " $tags " + str(len(self.tags))
+
+    def fake_it(self):
+        import statistics as s
+        #nodes = [  (y,x)  ]
+        y = []
+        x = []
+        for i in self.nodes:
+            y.append(i[0])
+            x.append(i[1])
+
+        y_s = s.mean([float(max(y)), float(min(y))])
+        x_s = s.mean([float(max(x)), float(min(x))])
+        self.fake_node = (y_s, x_s)
+        return y_s, x_s
+
+    def fake_instance(self):
+        return Node(self.iD, self.fake_node[0], self.fake_node[1], '?')
+
+
 class osmParser:
 
     def __init__(self, path="export.osm", nodes=None, ways=None):
         self.path = path
         import xml.etree.ElementTree as XML
-        import osm_class as OC
 
         plik = XML.parse(self.path)
         root = plik.getroot()
@@ -28,7 +68,7 @@ class osmParser:
                         k = tag.attrib["k"]
                         v = tag.attrib["v"]
                         tags[k] = v
-                c = OC.Node(iD, lat, lon, tags)
+                c = Node(iD, lat, lon, tags)
                 nodes_list.append(c)
                 # else:
                 #     break
@@ -48,7 +88,7 @@ class osmParser:
                             v = instance.attrib["v"]
                             tags[k] = v
 
-                w = OC.Way(iD, nodes, tags)
+                w = Way(iD, nodes, tags)
                 ways_list.append(w)
 
         self.nodes = nodes_list

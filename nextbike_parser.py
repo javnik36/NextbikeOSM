@@ -1,10 +1,53 @@
+class Place:
+
+    def __init__(self, uid, lat, lon, name, num, stands, bike_numbers=None):
+        self.uid = uid
+        self.lat = lat
+        self.lon = lon
+        self.name = name
+        self.num = num
+        self.stands = stands
+        self.bike_numbers = []
+
+    def __str__(self):
+        return "#" + str(self.uid) + ": " + str(self.num) + "," + self.name + " with " + str(self.stands) + " stands. $lat$" + str(self.lat) + " $lon$" + str(self.lon) + " $bike_numbers$" + str(len(self.bike_numbers))
+
+
+class City:
+
+    def __init__(self, uid, name, places=None):
+        self.uid = uid
+        self.name = name
+        self.places = []
+
+    def __str__(self):
+        return "#" + str(self.uid) + " @" + self.name + " with " + str(len(self.places)) + " places."
+
+    def get(self, nr):
+        if self.uid == nr:
+            return self.places
+
+    def get_uid(self):
+        return self.uid
+
+
+class Country:
+
+    def __init__(self, name, country, cities=None):
+        self.name = name
+        self.country = country
+        self.cities = []
+
+    def __str__(self):
+        return "$" + self.name + " @" + self.country + " with " + str(len(self.cities)) + " cities."
+
+
 class NextbikeParser:
 
     '''Aggregates Nextbike country Classes'''
 
     def __init__(self, countrys=None):
         import xml.etree.ElementTree as XML
-        import nextbike_class as NC
         import urllib.request as urllib
         import os
 
@@ -25,14 +68,14 @@ class NextbikeParser:
             name = country.attrib["name"]
             coun = country.attrib["country"]
 
-            C = NC.Country(name, coun)
+            C = Country(name, coun)
             for city in country:
                 place_list = []
 
                 uid = city.attrib["uid"]
                 name = city.attrib["name"]
 
-                c = NC.City(uid, name)
+                c = City(uid, name)
 
                 for place in city:
                     try:
@@ -50,10 +93,10 @@ class NextbikeParser:
                             bike_stands = "!"
                         try:
                             bike_nrs = place.attrib["bike_numbers"]
-                            n = NC.Place(
+                            n = Place(
                                 uid, lat, lon, name, num, bike_stands, bike_nrs)
                         except:
-                            n = NC.Place(uid, lat, lon, name, num, bike_stands)
+                            n = Place(uid, lat, lon, name, num, bike_stands)
 
                     except Exception as e:
                         print(e)

@@ -4,3 +4,4 @@
 *.html
 /__pycache__
 debug.py
+*class.py
