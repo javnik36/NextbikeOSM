@@ -63,7 +63,8 @@ class osmParser:
                 # if len(list(child)) != 0:
                 for tag in child:
                     if tag.attrib["k"] == "amenity":
-                        pass
+                        if tag.attrib["v"] == "bicycle_rental":
+                            tags["is_rental"] = "yes"
                     elif tag.attrib["k"] in ["capacity", "name", "network", "operator", "ref", "website", "source"]:
                         k = tag.attrib["k"]
                         v = tag.attrib["v"]
@@ -82,7 +83,8 @@ class osmParser:
                         nodes.append(instance.attrib["ref"])
                     else:
                         if instance.attrib["k"] == "amenity":
-                            pass
+                            if tag.attrib["v"] == "bicycle_rental":
+                                tags["is_rental"] = "yes"
                         elif instance.attrib["k"] in ["capacity", "name", "network", "operator", "ref", "website", "source"]:
                             k = instance.attrib["k"]
                             v = instance.attrib["v"]
