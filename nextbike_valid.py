@@ -179,6 +179,12 @@ class NextbikeValidator:
         # num         ref {tags}
         # stands      capacity {tags}++
 
+    def is_whatever(self, path):
+        if self.osm_data.nodes == [] and self.osm_data.ways == []:
+            self.html = '''<html>\n<head><meta charset="UTF-8"></head>\n<body>\n<h2>Received empty dataset...sorry :(</h2><br>Add some data in this vicinity, then look here later.</body>\n</html>'''
+            self.save_it(path)
+            raise ValueError("OSM Data not found!")
+
 if __name__ == "__main__":
     import sys
     try:
@@ -199,6 +205,7 @@ if __name__ == "__main__":
                 d = b.find_city(place)
             else:
                 d = b.find_network(place)
+            c.is_whatever(html)
             c.pair_it(d)
             c.html_it()
             c.save_it(html)
@@ -218,6 +225,7 @@ if __name__ == "__main__":
                 d = b.find_city(place)
             else:
                 d = b.find_network(place)
+            c.is_whatever(html)
             c.pair_it(d)
             c.html_it()
             c.save_it(html)
