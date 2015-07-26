@@ -36,7 +36,7 @@ class Way:
         return y_s, x_s
 
     def fake_instance(self):
-        return Node(self.iD, self.fake_node[0], self.fake_node[1], '?')
+        return Node(self.iD, self.fake_node[0], self.fake_node[1], self.tags)
 
 
 class osmParser:

@@ -24,33 +24,63 @@ class NextbikeValidator:
         # Haversine formula
         dist = 2 * R * m.asin(m.sqrt((m.sin(m.radians(0.5 * (lat_next - lat_osm))))**2 + m.cos(m.radians(
             lat_osm)) * m.cos(m.radians(lat_next)) * (m.sin(m.radians(0.5 * (lon_next - lon_osm))))**2))  # in KM
-        dist_m = dist * 1000  # WORKS!
+        dist_m = round((dist * 1000), 2)  # WORKS!
         return dist_m
 
-    def pair_it(self, next_places):
+    def via_id(self, place):
+        '''Return osm feature by ref matching'''
+        # input: next_place (nextbike Place)
+        nextb_ref = place.num
+        for i in self.osm_data.nodes:
+            for k, v in i.tags.items():
+                if k == "ref":
+                    if v == nextb_ref:
+                        return i
+                    else:
+                        pass
+        return None
+
+    def via_distance(self, place):
+        '''Return osm feature by distance matching'''
+        dist = 10000000
+        nearest = 0
+        for i in self.osm_data.nodes:
+            meas = self.measure(place, i)
+            if meas < dist:
+                dist = meas
+                nearest = i
+            elif meas > dist:
+                continue
+        return [nearest, dist]
+
+    def pair(self, next_places):
         '''Makes pair of OSM and Nexbike features by they's distance.'''
         # input: list of next_places from city & osm
         dane = []
         for i in next_places:
-            dist = 10000000
-            nearest = 0
-            for t in self.osm_data.nodes:
-                meas = self.measure(i, t)
-                if meas < dist:
-                    dist = meas
-                    nearest = t
-                elif meas > dist:
-                    continue
+            id_match = self.via_id(i)
+            if id_match != None:
+                meas = self.measure(i, id_match)
 
-            fway = self.osm_data.find(nearest.iD, 'w')
-            if fway != None:
-                d1 = (dist, i, fway, 'w')
+                fway = self.osm_data.find(id_match.iD, 'w')
+                if fway != None:
+                    d1 = (meas, i, fway, 'w', 'id')
+                else:
+                    d1 = (meas, i, id_match, 'n', 'id')
+                dane.append(d1)
             else:
-                d1 = (dist, i, nearest)
-            dane.append(d1)
+                data = self.via_distance(i)
+                obj = data[0]
+                meas = data[1]
+
+                fway = self.osm_data.find(obj.iD, 'w')
+                if fway != None:
+                    d1 = (meas, i, fway, 'w', 'di')
+                else:
+                    d1 = (meas, i, obj, 'n', 'di')
+                dane.append(d1)
 
         self.pair_bank = dane
-        # return dane
 
     def html_it(self):
         '''Produces html with processing data.'''
@@ -102,12 +132,14 @@ class NextbikeValidator:
             dist = i[0]
             nextb = i[1]
             osm = i[2]
-            if i[-1] == 'w':
+            if i[-2] == 'w':
                 mapa1 = '<a href="http://www.openstreetmap.org/way/{uid}">{uid}</a>'
             else:
                 mapa1 = '<a href="http://www.openstreetmap.org/node/{uid}">{uid}</a>'
             mapa2 = '<a href="http://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map=19/{lat}/{lon}">{uid}</a>'
+            josm = '<a href="http://localhost:8111/load_and_zoom?left={minlon}&right={maxlon}&top={maxlat}&bottom={minlat}">josm</a>'
             stry = "<td class='red'>"
+            offset = 0.0009
 
             if counter % 2 != 0:
                 P = "<tr>\n"
@@ -123,7 +155,8 @@ class NextbikeValidator:
             counter += 1
             self.html += P
             self.html += st + \
-                mapa2.format(lat=nextb.lat, lon=nextb.lon, uid=nextb.uid) + en
+                mapa2.format(lat=nextb.lat, lon=nextb.lon, uid=nextb.uid) + '\n' + josm.format(minlon=str((float(nextb.lon) - offset)),
+                                                                                               maxlon=str((float(nextb.lon) + offset)), minlat=str((float(nextb.lat) - offset)), maxlat=str((float(nextb.lat) + offset))) + en
             self.html += st + mapa1.format(uid=osm.iD) + en
             if dist > 50:
                 self.html += stry + str(dist) + en
@@ -206,7 +239,7 @@ if __name__ == "__main__":
             else:
                 d = b.find_network(place)
             c.is_whatever(html)
-            c.pair_it(d)
+            c.pair(d)
             c.html_it()
             c.save_it(html)
         elif sys.argv[1] == "-a":
@@ -226,7 +259,7 @@ if __name__ == "__main__":
             else:
                 d = b.find_network(place)
             c.is_whatever(html)
-            c.pair_it(d)
+            c.pair(d)
             c.html_it()
             c.save_it(html)
         elif sys.argv[1] == "-d":
@@ -238,7 +271,7 @@ if __name__ == "__main__":
             b.get_uids()
             c = NextbikeValidator(b, a)
             d = b.find_network("VETURILO Poland")
-            c.pair_it(d)
+            c.pair(d)
             c.html_it()
             c.save_it("RESUME.html")
         elif sys.argv[1] == "-u":
@@ -264,7 +297,7 @@ if __name__ == "__main__":
             d = b.find_city(place)
         else:
             d = b.find_network(place)
-        c.pair_it(d)
+        c.pair(d)
         c.html_it()
         html = input("______________\nHTML name?\n")
         c.save_it(html)
