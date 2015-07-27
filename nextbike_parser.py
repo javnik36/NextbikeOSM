@@ -86,11 +86,11 @@ class NextbikeParser:
                         try:
                             num = place.attrib["number"]
                         except:
-                            num = 9999
+                            num = 0000
                         try:
                             bike_stands = place.attrib["bike_racks"]
                         except:
-                            bike_stands = "!"
+                            bike_stands = "None"
                         try:
                             bike_nrs = place.attrib["bike_numbers"]
                             n = Place(
