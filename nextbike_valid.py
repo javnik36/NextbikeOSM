@@ -227,8 +227,12 @@ class NextbikeValidator:
         # stands      capacity {tags}++
 
     def is_whatever(self, path):
+        from time import localtime, strftime
+        timek = strftime("%a, %d %b @ %H:%M:%S", localtime())
+
         if self.osm_data.nodes == [] and self.osm_data.ways == []:
-            self.html = '''<html>\n<head><meta charset="UTF-8"></head>\n<body>\n<h2>Received empty dataset...sorry :(</h2><br>Add some data in this vicinity, then look here later.</body>\n</html>'''
+            self.html = '''<html>\n<head><meta charset="UTF-8"></head>\n<body>\n<h2>Received empty dataset...sorry :(</h2><br>Add some data in this vicinity, then look here later.<br><br><i>Last checked: {last}</i></body>\n</html>'''.format(
+                last=timek)
             self.save_it(path)
             raise ValueError("OSM Data not found!")
 
