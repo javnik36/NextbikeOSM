@@ -87,7 +87,12 @@ class NextbikeValidator:
         import difflib as SC
         from time import localtime, strftime
         timek = strftime("%a, %d %b @ %H:%M:%S", localtime())
-        self.html = '''<html>\n<head><meta charset="UTF-8">\n<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>\n<script type="text/javascript" src="./jquery.floatThead.min.js"></script>\n</head>
+        self.html = '''<html>\n<head>
+        <link rel="icon" type="image/png" href="../favs/db-32x32.png" sizes="32x32">
+        <link rel="icon" type="image/png" href="../favs/db-194x194.png" sizes="194x194">
+        <link rel="icon" type="image/png" href="../favs/db-96x96.png" sizes="96x96">
+        <link rel="icon" type="image/png" href="../favs/db-16x16.png" sizes="16x16">
+        <meta charset="UTF-8">\n<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>\n<script type="text/javascript" src="./jquery.floatThead.min.js"></script>\n</head>
         <body>
         <script>
         $(function() {
