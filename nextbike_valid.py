@@ -92,13 +92,52 @@ class NextbikeValidator:
         <link rel="icon" type="image/png" href="../favs/db-194x194.png" sizes="194x194">
         <link rel="icon" type="image/png" href="../favs/db-96x96.png" sizes="96x96">
         <link rel="icon" type="image/png" href="../favs/db-16x16.png" sizes="16x16">
-        <meta charset="UTF-8">\n<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>\n<script type="text/javascript" src="./jquery.floatThead.min.js"></script>\n</head>
+        <meta charset="UTF-8">\n<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>\n<script type="text/javascript" src="./jquery.floatThead.min.js"></script>\n<script type="text/javascript" src="./jquery.tablesorter.min.js"></script>\n<link rel="stylesheet" href="./theme.default.css"></head>
         <body>
         <script>
         $(function() {
             $('table').floatThead({
                 useAbsolutePositioning: true
             });
+        });
+        $.tablesorter.addParser({
+          id: 'refs',
+          is: function(s, table, cell, $cell) {
+            return false;
+          },
+          format: function(s, table, cell, cellIndex) {
+            if (s.length == 4){
+                return s.concat('0');
+            } else{
+                return s;
+            }
+          },
+          type: 'numeric'
+        });
+        $(function(){
+        $('table').tablesorter({
+            widgets:["zebra"],
+            widgetOptions:{
+                zebra : [ ,"fill" ]
+            },
+
+            headers: {
+                0:{sorter:false},
+                1:{sorter:false},
+                2:{sorter:true},
+                3:{sorter:false},//name TOP
+                4:{sorter:false},//ref TOP
+                5:{sorter:false},//stands TOP
+                6:{sorter:false},//network
+                7:{sorter:false},
+                8:{sorter:false},
+                9:{sorter:false},
+                10:{sorter:'refs'},//nextb ref
+                11:{sorter:'refs'},//ref osm
+                12:{sorter:false},
+                13:{sorter:false},
+            }
+        });
         });
         </script>
         <style>
@@ -115,6 +154,10 @@ class NextbikeValidator:
             }
             .red{
                 background-color: #FF8080;
+            }
+            .svg{
+                width: 20px;
+                height: 20px;
             }
             </style>'''
         self.html += "<i>Updated: " + timek + "</i>"
@@ -142,7 +185,6 @@ class NextbikeValidator:
             </thead>
             <tbody>
             '''
-        counter = 1
         for i in self.pair_bank:
             dist = i[0]
             nextb = i[1]
@@ -152,27 +194,29 @@ class NextbikeValidator:
             else:
                 mapa1 = '<a href="http://www.openstreetmap.org/node/{uid}">{uid}</a>'
             mapa2 = '<a href="http://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map=19/{lat}/{lon}">{uid}</a>'
-            josm = '<a href="http://localhost:8111/load_and_zoom?left={minlon}&right={maxlon}&top={maxlat}&bottom={minlat}">josm</a>'
+            josm = '<a href="http://localhost:8111/load_and_zoom?left={minlon}&right={maxlon}&top={maxlat}&bottom={minlat}&select={sel}"><img src="./josm.svg" class="svg" alt="josm"></a>'
             stry = "<td class='red'>"
             offset = 0.0009
 
-            if counter % 2 != 0:
-                P = "<tr>\n"
-                K = "</tr>\n"
-                st = "<td class='fill'>\n"
-                en = "</td>\n"
-            else:
-                P = "<tr>\n"
-                K = "</tr>\n"
-                st = "<td>\n"
-                en = "</td>\n"
+            P = "<tr>\n"
+            K = "</tr>\n"
+            st = "<td>\n"
+            en = "</td>\n"
 
-            counter += 1
             self.html += P
+
             self.html += st + \
-                mapa2.format(lat=nextb.lat, lon=nextb.lon, uid=nextb.uid) + '\n' + josm.format(minlon=str((float(nextb.lon) - offset)),
-                                                                                               maxlon=str((float(nextb.lon) + offset)), minlat=str((float(nextb.lat) - offset)), maxlat=str((float(nextb.lat) + offset))) + en
-            self.html += st + mapa1.format(uid=osm.iD) + en
+                mapa2.format(lat=nextb.lat, lon=nextb.lon, uid=nextb.uid) + en
+            bbox = (str((float(nextb.lon) - offset)), str((float(nextb.lon) + offset)),
+                    str((float(nextb.lat) - offset)), str((float(nextb.lat) + offset)))
+            if i[-1] == 'id':
+                wyb = i[-2] + osm.iD
+                self.html += st + mapa1.format(uid=osm.iD) + '\n' + josm.format(
+                    minlon=bbox[0], maxlon=bbox[1], minlat=bbox[2], maxlat=bbox[3], sel=wyb) + en
+            else:
+                self.html += st + mapa1.format(uid=osm.iD) + '\n' + josm.format(
+                    minlon=bbox[0], maxlon=bbox[1], minlat=bbox[2], maxlat=bbox[3], sel='') + en
+
             if dist > 50 and i[-1] == 'id':
                 self.html += stry + '<b>' + str(dist) + '</b>' + en
             elif dist > 50:
