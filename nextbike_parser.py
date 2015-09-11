@@ -134,9 +134,30 @@ class NextbikeParser:
                     e = city.places
                     return e
 
+    def check_uids(self, new_uids):
+        old_uids = []
+        with open("uids.set", 'r') as f:
+            for line in f.readlines():
+                line = line.rstrip()
+                old_uids.append(line)
+
+        def diff(a, b):
+            b = set(b)
+            difr = [aa for aa in a if aa not in b]
+            return difr
+
+        removed = diff(old_uids, new_uids)
+        new = diff(new_uids, old_uids)
+
+        if removed != []:
+            print("REMOVED UIDS FOUND! {0}".format(str(removed)))
+        if new != []:
+            print("NEW UIDS FOUND! {0}".format(str(new)))
+
     def get_uids(self, cons="n"):
         '''Makes file with all uids from xml-file. If cons='y' it's print it to console too.'''
         temp = []
+        uids = []
         for c in self.countrys:
             p = c.name
             temp.append("_______________")
@@ -146,6 +167,7 @@ class NextbikeParser:
                 b = str(ci.name)
                 c = a + ' ' + b
                 temp.append(c)
+                uids.append(a)
 
         plik = open("nextbike_uids.txt", 'w', encoding="utf-8")
         plik.write("Network\nuid<<>>city name\n")
@@ -154,6 +176,12 @@ class NextbikeParser:
                 print(str(i))
             plik.write(str(i) + '\n')
         plik.close()
+
+        self.check_uids(uids)
+
+        with open("uids.set", 'w') as f:
+            for i in uids:
+                f.write("{0}\n".format(i))
 
     @staticmethod
     def update():
