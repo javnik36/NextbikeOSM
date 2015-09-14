@@ -1,6 +1,7 @@
 *.xml
 *.osm
 *.txt
+*.set
 *.html
 /__pycache__
 debug.py
