@@ -22,16 +22,17 @@ class Way:
         return str(self.iD) + " $points " + str(len(self.nodes)) + " $tags " + str(len(self.tags))
 
     def fake_it(self):
-        import statistics as s
         #nodes = [  (y,x)  ]
-        y = []
-        x = []
+        count = 0
+        y_count = 0
+        x_count = 0
         for i in self.nodes:
-            y.append(i[0])
-            x.append(i[1])
+            y_count += float(i[0])
+            x_count += float(i[1])
+            count += 1
 
-        y_s = s.mean([float(max(y)), float(min(y))])
-        x_s = s.mean([float(max(x)), float(min(x))])
+        y_s = y_count / count
+        x_s = x_count / count
         self.fake_node = (y_s, x_s)
         return y_s, x_s
 
