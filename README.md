@@ -11,25 +11,23 @@ You need to have [python 3](https://www.python.org/downloads/) installed.<br>
 4. Open html with data :lollipop:
 
 ##Technical details
-This script looks for closest node from osm with by using Haversine formula. ***Note that sometimes the closest node is not correct node!*** Then chcecks tags and compares strings in name tag using [GESTALT.C (Ratcliff/Obershelp Pattern Recognition Algorithm)](http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/DDJ/1988/8807/8807c/8807c.htm) built-in [python difflib module](https://docs.python.org/3.4/library/difflib.html). And of course...it make html from it :)
+This script tries to match stations by ref, when impossible looks for closest node using Haversine formula. ***Note that sometimes the closest node is not correct node!*** Then chcecks tags and compares strings in name tag using [GESTALT.C (Ratcliff/Obershelp Pattern Recognition Algorithm)](http://collaboration.cmc.ec.gc.ca/science/rpn/biblio/ddj/Website/articles/DDJ/1988/8807/8807c/8807c.htm) built-in [python difflib module](https://docs.python.org/3.4/library/difflib.html). And of course...it make html from it :)
 
 ##Help
 Open [nextbike_valid.py](https://github.com/javnik36/NextbikeOSM/blob/master/nextbike_valid.py) in command line using:
 ```
-python nextbike_valid.py [flag]
-```
-If you run app without any flag it would run 4-step guide. So...for anyone :)
+usage: nextbike_valid.py [-h] [-a NETWORK OSM_PATH HTML_PATH] [-i] [-u]
 
+optional arguments:
+  -h, --help            show this help message and exit
+  -a NETWORK OSM_PATH HTML_PATH, --auto NETWORK OSM_PATH HTML_PATH
+                        NETWORK is uid or name to be found in
+                        nextbike_uids.txt
+  -i, --interactive     runs interactive guide
+  -u, --update          updates manually nextbike .xml file and .set file wit
+                        uids
+```
 If you need more help, ask me (email or whatever :smile:)!
-
-####Flags
-```
--a => makes all automatic:
-python nextbike_valid.py network_name(or city_uid) osm_path html_path
--d => for debugging(default working schema)
--h => help(now...not helping ;)
--u => updates xml from nextbike
-```
 
 ####Examples
 * Processes data for network *VETURILO Poland*, takes osm data from *export.osm* and saves html to *my.html*
