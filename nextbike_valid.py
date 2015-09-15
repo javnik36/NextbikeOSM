@@ -139,9 +139,12 @@ class NextbikeValidator:
         timek = strftime("%a, %d %b @ %H:%M:%S", localtime())
 
         if self.osm_data.nodes == [] and self.osm_data.ways == []:
-            self.html = '''<html>\n<head><meta charset="UTF-8"></head>\n<body>\n<h2>Received empty dataset...sorry :(</h2><br>Add some data in this vicinity, then look here later.<br><br><i>Last checked: {last}</i></body>\n</html>'''.format(
-                last=timek)
-            self.save_it(path)
+            template = self.envir.get_template("empty.html")
+            fill_template = template.render({'last': timek})
+
+            with open(path, 'w', encoding="utf-8") as f:
+                f.write(fill_template)
+
             raise ValueError("OSM Data not found!")
 
 if __name__ == "__main__":
