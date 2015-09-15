@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="./jquery.floatThead.min.js"></script>
+    <script type="text/javascript" src="./jquery.tablesorter.min.js"></script>
+    <link rel="stylesheet" href="./theme.default.css">
+</head>
+<style>
+    table,
+    td,
+    tr,
+    th {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background-color: white;
+        /*border: 1px solid black;*/
+    }
+
+    .fill {
+        background-color: #D4D4D4;
+    }
+
+    .red {
+        background-color: #FF8080;
+    }
+
+    .svg {
+        width: 20px;
+        height: 20px;
+    }
+</style>
+
+<body>
+    <script>
+        $(function() {
+            $('table').floatThead({
+                useAbsolutePositioning: true
+            });
+        });
+        $.tablesorter.addParser({
+            id: 'refs',
+            is: function(s, table, cell, $cell) {
+                return false;
+            },
+            format: function(s, table, cell, cellIndex) {
+                if (s.length == 4) {
+                    return s.concat('0');
+                } else {
+                    return s;
+                }
+            },
+            type: 'numeric'
+        });
+        $(function() {
+            $('table').tablesorter({
+                widgets: ["zebra"],
+                widgetOptions: {
+                    zebra: [, "fill"]
+                },
+
+                headers: {
+                    0: {sorter: false},
+                    1: {sorter: false},
+                    2: {sorter: true},
+                    3: {sorter: false}, //name TOP
+                    4: {sorter: false}, //ref TOP
+                    5: {sorter: false}, //stands TOP
+                    6: {sorter: false}, //network
+                    7: {sorter: false},
+                    8: {sorter: false},
+                    9: {sorter: false},
+                    10: {sorter: 'refs'}, //nextb ref
+                    11: {sorter: 'refs'}, //ref osm
+                    12: {sorter: false},
+                    13: {sorter: false},
+                }
+            });
+        });
+    </script>
+    <i>{{ timek }}</i>
+    <table>
+        <thead>
+            <tr>
+                <th rowspan="2">NextBike
+                    <br>uid</th>
+                <th rowspan="2">OSM id
+                    <br>(closest match)</th>
+                <th rowspan="2">Distance
+                    <br>(in meters)</th>
+                <th colspan="2">Name</th>
+                <th colspan="2">Ref</th>
+                <th colspan="2">Stands</th>
+                <th rowspan="2">Network</th>
+                <th rowspan="2">Operator</th>
+            </tr>
+            <tr>
+                <th>nextbike</th>
+                <th>osm</th>
+                <th>nextbike</th>
+                <th>osm</th>
+                <th>nextbike</th>
+                <th>osm</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in items %}
+            <tr>
+                <td>
+                    <a href="http://www.openstreetmap.org/?mlat={{ i.nxtb.lat }}&mlon={{ i.nxtb.lon }}#map=19/{{ i.nxtb.lat }}/{{ i.nxtb.lon }}">{{ i.nxtb.uid }}</a>
+                </td>
+                <td>
+                    {% if i.type == 'w' %}
+                    <a href="http://www.openstreetmap.org/way/{{ i.osm.iD }}">{{ i.osm.iD }}</a> {% else %}
+                    <a href="http://www.openstreetmap.org/node/{{ i.osm.iD }}">{{ i.osm.iD }}</a> {% endif %}
+                    <a href="http://localhost:8111/load_and_zoom?left={{ i.nxtb.lon|float - 0.0009 }}&right={{ i.nxtb.lon|float + 0.0009 }}&top={{ i.nxtb.lat|float + 0.0009 }}&bottom={{ i.nxtb.lat|float - 0.0009 }}&select={{ i.type ~ i.osm.iD }}">
+                        <img src="./josm.svg" class="svg" alt="josm">
+                    </a>
+                </td>
+                <td {% if i.distance>50 %}class="red"{% endif %}> {% if i.match == 'id' %}<b>{% endif %}{{ i.distance }}{% if i.match == 'id' %}</b>{% endif %}
+                </td>
+                <td>
+                    {{ i.nxtb.name }}
+                </td>
+                <td {% if i.prob|float <= 0.8 %}class="red" {% endif %}>
+                    {{ i.osm.tags.name|default("NONE") }}
+                </td>
+                <td>
+                    {{ i.nxtb.num }}
+                </td>
+                <td {% if i.nxtb.num != i.osm.tags.ref %}class="red" {% endif %}>
+                    {{ i.osm.tags.ref|default("NONE") }}
+                </td>
+                <td>
+                    {{ i.nxtb.stands }}
+                </td>
+                <td {% if i.nxtb.stands != i.osm.tags.capacity %}class="red" {% endif %}>
+                    {{ i.osm.tags.capacity|default("NONE") }}
+                </td>
+                <td {% if not i.osm.tags.network %}class="red" {% endif %}>
+                    {{ i.osm.tags.network|default("NONE") }}
+                </td>
+                <td {% if not i.osm.tags.operator %}class="red" {% endif %}>
+                    {{ i.osm.tags.operator|default("NONE") }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <i>{{ copy }}</i>
+</body>
+
+</html>

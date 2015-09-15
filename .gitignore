@@ -1,8 +1,9 @@
-*.xml
-*.osm
-*.txt
-*.set
-*.html
+!/templates
 /__pycache__
-debug.py
-*class.py
+/*.xml
+/*.osm
+/*.txt
+/*.set
+/*.html
+/debug.py
+/*class.py
