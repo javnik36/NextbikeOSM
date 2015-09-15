@@ -148,75 +148,42 @@ class NextbikeValidator:
             raise ValueError("OSM Data not found!")
 
 if __name__ == "__main__":
-    import sys
-    try:
-        if sys.argv[1] == "-a" and sys.argv[2] == "-u":
-            place = sys.argv[3]
-            path_osm = sys.argv[4]
-            html = sys.argv[5]
+    import argparse
 
-            a = OP.osmParser(path_osm)
-            a.fill_ways()
-            a.clear_nodes()
-            a.fake_all()
-            NP.NextbikeParser.update()
-            b = NP.NextbikeParser()
-            b.get_uids()
-            c = NextbikeValidator(b, a)
-            if place.isnumeric():
-                d = b.find_city(place)
-            else:
-                d = b.find_network(place)
-            c.is_whatever(html)
-            c.pair(d)
-            c.html_it(html)
-        elif sys.argv[1] == "-a":
-            place = sys.argv[2]
-            path_osm = sys.argv[3]
-            html = sys.argv[4]
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-a', '--auto', action='store', nargs=3, metavar=('NETWORK', 'OSM_PATH', 'HTML_PATH'),
+                        help='NETWORK is uid or name to be found in nextbike_uids.txt')
+    parser.add_argument(
+        '-i', '--interactive', action='store_true', help='runs interactive guide')
+    parser.add_argument(
+        '-u', '--update', action='store_true', help='updates manually nextbike .xml file and .set file with uids')
+    args = parser.parse_args()
 
-            a = OP.osmParser(path_osm)
-            a.fill_ways()
-            a.clear_nodes()
-            a.fake_all()
-            b = NP.NextbikeParser()
-            b.get_uids()
-            c = NextbikeValidator(b, a)
-            if place.isnumeric():
-                d = b.find_city(place)
-            else:
-                d = b.find_network(place)
-            c.is_whatever(html)
-            c.pair(d)
-            c.html_it(html)
-        elif sys.argv[1] == "-d":
-            a = OP.osmParser()
-            a.fill_ways()
-            a.clear_nodes()
-            a.fake_all()
-            b = NP.NextbikeParser()
-            b.get_uids()
-            c = NextbikeValidator(b, a)
-            d = b.find_network("VETURILO Poland")
-            c.pair(d)
-            c.html_it()
-            c.save_it("RESUME.html")
-        elif sys.argv[1] == "-u":
-            NP.NextbikeParser.update()
-        elif sys.argv[1] == "help":
-            print(
-                "python nextbike_valid.py -a (-u) network_name osm_path html_path")
-            print("python nextbike_valid.py : guide for anyone")
-            print("python nextbike_valid.py -d : default for debugging")
-            print("python nextbike_valid.py -u : updates xml manually")
-    except:
+    if args.update:
+        NP.NextbikeParser.update()
+        a = NP.NextbikeParser()
+        a.get_uids()
+    if args.auto:
+        a = OP.osmParser(args.auto[1])
+        a.fill_ways()
+        a.clear_nodes()
+        a.fake_all()
+        b = NP.NextbikeParser()
+        c = NextbikeValidator(b, a)
+        if args.auto[0].isnumeric():
+            d = b.find_city(args.auto[0])
+        else:
+            d = b.find_network(args.auto[0])
+        c.is_whatever(args.auto[2])
+        c.pair(d)
+        c.html_it(args.auto[2])
+    if args.interactive:
         path_osm = input("Write path to osm file:\n")
         a = OP.osmParser(path_osm)
         a.fill_ways()
         a.clear_nodes()
         a.fake_all()
         b = NP.NextbikeParser()
-        b.get_uids()
         place = input(
             "______________\nWhat kind of network\city should I process?\n>If you want particular city please write it's uid number from nextbike_uids.txt\n>>For whole network write it's name(within ''), also from nextbike_uids.txt\n")
         c = NextbikeValidator(b, a)
@@ -226,5 +193,6 @@ if __name__ == "__main__":
             d = b.find_network(place)
         c.pair(d)
         html = input("______________\nHTML name?\n")
+        c.is_whatever(html)
         c.html_it(html)
         print("______________\nAll done...thanks!")
