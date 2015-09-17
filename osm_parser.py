@@ -1,25 +1,39 @@
 class Node:
 
-    def __init__(self, iD, lat, lon, tags):
+    def __init__(self, iD, lat, lon, tags, version=None, changeset=None, user=None, timestamp=None):
         self.iD = iD
         self.lat = lat
         self.lon = lon
         self.tags = tags  # []
+        self.version = version  # int
+        self.changeset = changeset  # int
+        self.user = user
+        self.timestamp = timestamp
 
     def __str__(self):
         return str(self.iD) + " @lat: " + str(self.lat) + " @lon: " + str(self.lon) + " $tags " + str(len(self.tags))
 
+    def type(self):
+        return 'node'
+
 
 class Way:
 
-    def __init__(self, iD, nodes, tags, fake_node=None):
+    def __init__(self, iD, nodes, tags, version=None, changeset=None, user=None, timestamp=None, fake_node=None):
         self.iD = iD
         self.nodes = nodes  # []
         self.tags = tags  # {}
         self.fake_node = None
+        self.version = version  # int
+        self.changeset = changeset  # int
+        self.user = user
+        self.timestamp = timestamp
 
     def __str__(self):
         return str(self.iD) + " $points " + str(len(self.nodes)) + " $tags " + str(len(self.tags))
+
+    def type(self):
+        return 'way'
 
     def fake_it(self):
         #nodes = [  (y,x)  ]
@@ -37,7 +51,7 @@ class Way:
         return y_s, x_s
 
     def fake_instance(self):
-        return Node(self.iD, self.fake_node[0], self.fake_node[1], self.tags)
+        return Node(self.iD, self.fake_node[0], self.fake_node[1], self.tags, user='fake')
 
 
 class osmParser:
@@ -59,6 +73,14 @@ class osmParser:
                 iD = child.attrib["id"]
                 lat = child.attrib["lat"]
                 lon = child.attrib["lon"]
+                try:
+                    ver = int(child.attrib["version"])
+                    chan = child.attrib["changeset"]
+                    user = child.attrib["user"]
+                    time = child.attrib["timestamp"]
+                except:
+                    #print("No version data")
+                    pass
                 tags = {}
 
                 # if len(list(child)) != 0:
@@ -70,13 +92,23 @@ class osmParser:
                         k = tag.attrib["k"]
                         v = tag.attrib["v"]
                         tags[k] = v
-                c = Node(iD, lat, lon, tags)
+                try:
+                    c = Node(iD, lat, lon, tags, ver, chan, user, time)
+                except:
+                    c = Node(iD, lat, lon, tags)
                 nodes_list.append(c)
                 # else:
                 #     break
 
             elif child.tag == "way":
                 iD = child.attrib["id"]
+                try:
+                    ver = int(child.attrib["version"])
+                    chan = child.attrib["changeset"]
+                    user = child.attrib["user"]
+                    time = child.attrib["timestamp"]
+                except:
+                    pass
                 nodes = []
                 tags = {}
                 for instance in child:
@@ -91,7 +123,12 @@ class osmParser:
                             v = instance.attrib["v"]
                             tags[k] = v
 
-                w = Way(iD, nodes, tags)
+                try:
+                    w = Way(iD, nodes, tags, version=ver,
+                            changeset=chan, user=user, timestamp=time)
+                except:
+                    w = Way(iD, nodes, tags)
+
                 ways_list.append(w)
 
         self.nodes = nodes_list
@@ -138,6 +175,16 @@ class osmParser:
             way.fake_it()
             fi = way.fake_instance()
             self.nodes.append(fi)
+
+    def remove_fakes(self):
+        '''Remove all fake nodes'''
+        new_nodes = []
+        for i in self.nodes:
+            if i.user == 'fake':
+                pass
+            else:
+                new_nodes.append(i)
+        self.nodes = new_nodes
 
     def dumb_nodes(self):
         print("DUMBING ALL NODES:................")

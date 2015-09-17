@@ -5,5 +5,7 @@
 /*.txt
 /*.set
 /*.html
+/*.exe
+/*.db
 /debug.py
 /*class.py

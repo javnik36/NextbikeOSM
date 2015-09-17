@@ -157,6 +157,8 @@ if __name__ == "__main__":
         '-i', '--interactive', action='store_true', help='runs interactive guide')
     parser.add_argument(
         '-u', '--update', action='store_true', help='updates manually nextbike .xml file and .set file with uids')
+    parser.add_argument(
+        '-f', '--feed', action='store_true', help='runs feed creation (only with -a!)')
     args = parser.parse_args()
 
     if args.update:
@@ -177,6 +179,15 @@ if __name__ == "__main__":
         c.is_whatever(args.auto[2])
         c.pair(d)
         c.html_it(args.auto[2])
+        if args.feed:
+            import feed_gen as FG
+            a.remove_fakes()
+            f = FG.Feed(args.auto[2].rstrip('.html'), a.nodes, a.ways, d)
+            f.new_db()
+            f.check_db()
+            f.make_feeds()
+            f.create_feed()
+
     if args.interactive:
         path_osm = input("Write path to osm file:\n")
         a = OP.osmParser(path_osm)
