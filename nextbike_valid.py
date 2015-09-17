@@ -87,7 +87,7 @@ class NextbikeValidator:
 
         self.pair_bank = dane
 
-    def html_it(self, nazwa="nextbikeOSM_results.html"):
+    def html_it(self, nazwa="nextbikeOSM_results.html", feed=False):
         '''Produces html with processing data.'''
         import difflib as SC
         from time import localtime, strftime
@@ -99,6 +99,8 @@ class NextbikeValidator:
         timestamp = 'Updated: {0}'.format(timek)
         copyright = "Created using NextbikeOSM.py v.{0} by Javnik".format(
             __VERSION__)
+        feed_info = '<a href="./{0}_atom.xml"><img src="../imgs/feed-icon-14x14.png"></a> '.format(
+            nazwa.rstrip('.html'))
 
         for i in self.pair_bank:
             i_dict = {}
@@ -120,8 +122,13 @@ class NextbikeValidator:
 
             dane.append(i_dict)
 
-        fill_template = template.render(
-            {'items': dane, 'timek': timestamp, 'copy': copyright})
+        if feed:
+            c = feed_info + copyright
+            fill_template = template.render(
+                {'items': dane, 'timek': timestamp, 'copy': c})
+        else:
+            fill_template = template.render(
+                {'items': dane, 'timek': timestamp, 'copy': copyright})
 
         with open(nazwa, 'w', encoding="utf-8") as f:
             f.write(fill_template)
@@ -178,15 +185,17 @@ if __name__ == "__main__":
             d = b.find_network(args.auto[0])
         c.is_whatever(args.auto[2])
         c.pair(d)
-        c.html_it(args.auto[2])
         if args.feed:
             import feed_gen as FG
+            c.html_it(args.auto[2], feed=True)
             a.remove_fakes()
             f = FG.Feed(args.auto[2].rstrip('.html'), a.nodes, a.ways, d)
             f.new_db()
             f.check_db()
             f.make_feeds()
             f.create_feed()
+        else:
+            c.html_it(args.auto[2])
 
     if args.interactive:
         path_osm = input("Write path to osm file:\n")
