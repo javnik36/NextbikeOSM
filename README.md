@@ -4,6 +4,10 @@
 This application parses data about bicycle rentals in nextbike public bike-sharing systems like (for more data [see wikipedia](https://en.wikipedia.org/wiki/Nextbike)) from [their website](http://nextbike.net/maps/nextbike-official.xml) and compares with data from [OpenStreetMap](http://www.openstreetmap.org).
 
 ##How to run this?
+###Dependencies
+* [jinja2](http://jinja.pocoo.org/docs/dev/)
+
+###Guide
 You need to have [python 3](https://www.python.org/downloads/) installed.<br>
 1. Download all files from this project.<br>
 2. Download osm data for your area from for example [overpass-turbo](http://overpass-turbo.eu/). [Here is suitable link](http://overpass-turbo.eu/s/an2); you must only go into your location and click export->download raw data<br>
@@ -16,7 +20,7 @@ This script tries to match stations by ref, when impossible looks for closest no
 ##Help
 Open [nextbike_valid.py](https://github.com/javnik36/NextbikeOSM/blob/master/nextbike_valid.py) in command line using:
 ```
-usage: nextbike_valid.py [-h] [-a NETWORK OSM_PATH HTML_PATH] [-i] [-u]
+usage: nextbike_valid.py [-h] [-a NETWORK OSM_PATH HTML_PATH] [-i] [-u] [-f]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -26,7 +30,9 @@ optional arguments:
   -i, --interactive     runs interactive guide
   -u, --update          updates manually nextbike .xml file and .set file wit
                         uids
+  -f, --feed            runs feed creation (only with -a!)
 ```
+Atom feed creation uses sqlite database to store history data about given region. It makes sense to run it, when you run it periodically and sabes files under the same names.<br>
 If you need more help, ask me (email or whatever :smile:)!
 
 ####Examples
