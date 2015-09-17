@@ -14,8 +14,8 @@
     <title>{{ article.title }}</title>
     <id>{{ article.id }}</id>
     <updated>{{ article.updated }}</updated>
-    <content type="html">
-    	{{ article.content }}
+    <content type="html"><![CDATA[
+    	{{ article.content }}]]>
     </content>
 </entry>
 {% endfor %}
