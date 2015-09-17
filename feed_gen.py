@@ -191,7 +191,7 @@ class Feed:
         articles = []
         for i in feeds:
             new_entry = {'title': i[
-                1], 'id': "{0}/{1}".format(self.objname, str(i[0])), 'updated': i[2], 'content': i[3]}
+                1], 'id': "{0}:{1}".format(self.objname, str(i[0])), 'updated': i[2], 'content': i[3]}
             articles.append(new_entry)
 
         timek = strftime("%Y-%m-%dT%H:%M:%S+01:00", localtime())
