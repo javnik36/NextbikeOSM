@@ -77,7 +77,7 @@ class Feed:
         if baza != []:
             for i in baza:
                 DEL = '''DELETE FROM {0}_OSM WHERE id={1}'''
-                c.execute(DEL.format(self.objname, i.iD))
+                c.execute(DEL.format(self.objname, i))
                 self.osm_rem.append(i)
 
         connection.commit()
@@ -106,7 +106,7 @@ class Feed:
         if baza != []:
             for i in baza:
                 DEL = '''DELETE FROM {0}_NXTB WHERE id={1}'''
-                c.execute(DEL.format(self.objname, i.num))
+                c.execute(DEL.format(self.objname, i))
                 self.nxtb_rem.append(i)
 
         connection.commit()
