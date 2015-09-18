@@ -116,7 +116,7 @@ class osmParser:
                         nodes.append(instance.attrib["ref"])
                     else:
                         if instance.attrib["k"] == "amenity":
-                            if tag.attrib["v"] == "bicycle_rental":
+                            if instance.attrib["v"] == "bicycle_rental":
                                 tags["is_rental"] = "yes"
                         elif instance.attrib["k"] in ["capacity", "name", "network", "operator", "ref", "website", "source"]:
                             k = instance.attrib["k"]

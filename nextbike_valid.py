@@ -1,7 +1,7 @@
 import osm_parser as OP
 import nextbike_parser as NP
 
-__VERSION__ = '2.0.0'
+__VERSION__ = '2.0.1'
 
 
 class NextbikeValidator:
@@ -143,6 +143,7 @@ class NextbikeValidator:
 
     def is_whatever(self, path):
         from time import localtime, strftime
+        import sys
         timek = strftime("%a, %d %b @ %H:%M:%S", localtime())
 
         if self.osm_data.nodes == [] and self.osm_data.ways == []:
@@ -152,7 +153,8 @@ class NextbikeValidator:
             with open(path, 'w', encoding="utf-8") as f:
                 f.write(fill_template)
 
-            raise ValueError("OSM Data not found!")
+            print("OSM Data not found!")
+            sys.exit()
 
 if __name__ == "__main__":
     import argparse
