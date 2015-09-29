@@ -97,7 +97,7 @@ class NextbikeValidator:
 
         dane = []
         timestamp = 'Updated: {0}'.format(timek)
-        copyright = "Created using NextbikeOSM.py v.{0} by Javnik".format(
+        copyright = "Created using NextbikeOSM v.{0} by Javnik".format(
             __VERSION__)
 
         for i in self.pair_bank:
