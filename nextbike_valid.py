@@ -97,7 +97,7 @@ class NextbikeValidator:
 
         dane = []
         timestamp = 'Updated: {0}'.format(timek)
-        copyright = "Created using NextbikeOSM.py v.{0} by Javnik".format(
+        copyright = "Created using NextbikeOSM v.{0} by Javnik".format(
             __VERSION__)
         feed_info = '<a href="./{0}_atom.xml"><img src="../imgs/feed-icon-14x14.png"></a> '.format(
             nazwa.rstrip('.html'))
