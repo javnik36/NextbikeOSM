@@ -84,7 +84,7 @@ class Feed:
 
         sel = '''SELECT * FROM {0}_NXTB WHERE id={1}'''
         new = '''INSERT INTO {0}_NXTB VALUES ({1}, '{2}')'''
-        upd = '''UPDATE {0}_NXTB SET name={1} WHERE id={2}'''
+        upd = '''UPDATE {0}_NXTB SET name='{1}' WHERE id={2}'''
 
         dbaza = c.execute(
             '''SELECT id FROM {0}_NXTB'''.format(self.objname)).fetchall()
