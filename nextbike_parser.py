@@ -57,7 +57,15 @@ class NextbikeParser:
         else:
             urllib.urlretrieve(path, "nextbike.xml")
 
-        plik = XML.parse("nextbike.xml")
+        try:
+            plik = XML.parse("nextbike.xml")
+        except:
+            print("Retrying to parse the data...")
+            urllib.urlretrieve(path, "nextbike.xml")
+            try:
+                plik = XML.parse("nextbike.xml")
+            except:
+                raise SyntaxError("Feed input data bad formed...:/")
         root = plik.getroot()
 
         C_list = []
