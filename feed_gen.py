@@ -1,5 +1,6 @@
 import sqlite3 as sql
-__DB__ = 'feeds.db'
+import dataset
+DB = 'sqlite:///feeds.db'
 
 
 class Feed:
@@ -22,25 +23,24 @@ class Feed:
 
     def new_db(self):
         import os
+        c = dataset.connect(DB)
+        base = "{0}_FEED"
 
-        connection = sql.connect(__DB__)
-        c = connection.cursor()
-        db_tables = c.execute('''SELECT * FROM sqlite_master''').fetchall()
+        db_tables = c.query('''SELECT * FROM sqlite_master''').fetchall()
         tables = []
         for i in db_tables:
             i = i[1]
             tables.append(i)
         if '{0}_OSM'.format(self.objname) not in tables:
-            c.execute(
+            c.query(
                 '''CREATE TABLE {0}_OSM (id INT, version INT)'''.format(self.objname))
         if '{0}_NXTB'.format(self.objname) not in tables:
-            c.execute(
+            c.query(
                 '''CREATE TABLE {0}_NXTB (id INT, name TEXT)'''.format(self.objname))
         if '{0}_FEED'.format(self.objname) not in tables:
-            c.execute(
+            c.query(
                 '''CREATE TABLE {0}_FEED (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, data TEXT, content TEXT)'''.format(self.objname))
         connection.commit()
-        connection.close()
 
     def detuple(self, lista):
         new_list = []
@@ -49,64 +49,57 @@ class Feed:
         return new_list
 
     def check_db(self):
-        connection = sql.connect(__DB__)
-        c = connection.cursor()
+        c = dataset.connect(DB)
         sel = '''SELECT * FROM {0}_OSM WHERE id={1}'''
-        new = '''INSERT INTO {0}_OSM VALUES ({1}, {2})'''
-        upd = '''UPDATE {0}_OSM SET version={1} WHERE id={2}'''
 
-        dbaza = c.execute(
+        dbaza = c.query(
             '''SELECT id FROM {0}_OSM'''.format(self.objname)).fetchall()
         baza = self.detuple(dbaza)
 
         for i in self.features:
-            osm_hist = c.execute(
+            osm_hist = c.query(
                 sel.format(self.objname, str(i.iD))).fetchone()
 
             if osm_hist == None:
                 self.osm_new.append(i)
-                c.execute(new.format(self.objname, i.iD, i.version))
+                c[self.objname + "_OSM"].insert(dict(id=i.iD, version=i.version))
             else:
                 if osm_hist[1] == i.version:
                     baza.remove(int(i.iD))
                 else:
                     self.osm_changes.append(i)
-                    c.execute(upd.format(self.objname, i.version, i.iD))
+                    c[self.objname + "_OSM"].update(dict(id=i.iD, version=i.version))
                     baza.remove(int(i.iD))
 
         if baza != []:
             for i in baza:
-                DEL = '''DELETE FROM {0}_OSM WHERE id={1}'''
-                c.execute(DEL.format(self.objname, i))
+                c[self.objname + "_OSM"].delete(id=i)
                 self.osm_rem.append(i)
 
-        connection.commit()
+        c.commit()
 
         sel = '''SELECT * FROM {0}_NXTB WHERE id={1}'''
-        new = '''INSERT INTO {0}_NXTB VALUES ({1}, '{2}')'''
-        upd = '''UPDATE {0}_NXTB SET name='{1}' WHERE id={2}'''
 
-        dbaza = c.execute(
+        dbaza = c.query(
             '''SELECT id FROM {0}_NXTB'''.format(self.objname)).fetchall()
         baza = self.detuple(dbaza)
         for i in self.places:
-            nxtb_hist = c.execute(sel.format(self.objname, i.num)).fetchone()
+            nxtb_hist = c.query(sel.format(self.objname, i.num)).fetchone()
 
             if nxtb_hist == None:
                 self.nxtb_new.append(i)
-                c.execute(new.format(self.objname, i.num, i.name))
+                c[self.objname + "_NXTB"].insert(dict(id=i.num, name=i.name))
             else:
                 if nxtb_hist[1] == i.name:
                     baza.remove(int(i.num))
                 else:
                     self.nxtb_changes += [nxtb_hist, i]
-                    c.execute(upd.format(self.objname, i.name, i.num))
+                    c[self.objname + "_NXTB"].update(dict(id=i.num, name=i.name))
                     baza.remove(int(i.num))
 
         if baza != []:
             for i in baza:
-                DEL = '''DELETE FROM {0}_NXTB WHERE id={1}'''
-                c.execute(DEL.format(self.objname, i))
+                c[self.objname + "_NXTB"].delete(id=i)
                 self.nxtb_rem.append(i)
 
         connection.commit()
@@ -116,10 +109,8 @@ class Feed:
         from time import localtime, strftime
         #osm_changes, osm_rem, osm_new
         #nxtb_changes, nxtb_rem, nxtb_new
-        connection = sql.connect(__DB__)
-        c = connection.cursor()
-
-        ins = '''INSERT INTO {0}_FEED VALUES (NULL, '{1}', '{2}', '{3}')'''
+        c = dataset.connect(DB)
+        base = "{0}_FEED"
 
         template = self.envir.get_template("osm_new.html")
         for i in self.osm_new:
@@ -127,41 +118,40 @@ class Feed:
 
             title = 'New bicycle rental in osm found!'
             timek = strftime("%Y-%m-%dT%H:%M:%S+01:00", localtime())
-            c.execute(
-                ins.format(self.objname, title, timek, fill_template))
+            ins_data = dict(id=None, title=title, data=timek, content=fill_template)
+            c[self.objname + "_FEED"].insert(ins_data)
         template = self.envir.get_template("osm_rem.html")
         for i in self.osm_rem:
             fill_template = template.render({'i': i, 'name': self.objname})
 
             title = 'Removed bicycle rental in osm found!'
             timek = strftime("%Y-%m-%dT%H:%M:%S+01:00", localtime())
-            c.execute(
-                ins.format(self.objname, title, timek, fill_template))
+            ins_data = dict(id=None, title=title, data=timek, content=fill_template)
+            c[self.objname + "_FEED"].insert(ins_data)
         template = self.envir.get_template("osm_changes.html")
         for i in self.osm_changes:
             fill_template = template.render({'i': i, 'name': self.objname})
 
             title = 'Changed bicycle rental in osm found!'
             timek = strftime("%Y-%m-%dT%H:%M:%S+01:00", localtime())
-            c.execute(
-                ins.format(self.objname, title, timek, fill_template))
-
+            ins_data = dict(id=None, title=title, data=timek, content=fill_template)
+            c[self.objname + "_FEED"].insert(ins_data)
         template = self.envir.get_template("nxtb_new.html")
         for i in self.nxtb_new:
             fill_template = template.render({'i': i, 'name': self.objname})
 
             title = 'New Nextbike bicycle rental found!'
             timek = strftime("%Y-%m-%dT%H:%M:%S+01:00", localtime())
-            c.execute(
-                ins.format(self.objname, title, timek, fill_template))
+            ins_data = dict(id=None, title=title, data=timek, content=fill_template)
+            c[self.objname + "_FEED"].insert(ins_data)
         template = self.envir.get_template("nxtb_rem.html")
         for i in self.nxtb_rem:
             fill_template = template.render({'i': i, 'name': self.objname})
 
             title = 'Removed Nextbike bicycle rental found!'
             timek = strftime("%Y-%m-%dT%H:%M:%S+01:00", localtime())
-            c.execute(
-                ins.format(self.objname, title, timek, fill_template))
+            ins_data = dict(id=None, title=title, data=timek, content=fill_template)
+            c[self.objname + "_FEED"].insert(ins_data)
         template = self.envir.get_template("nxtb_changes.html")
         for i in self.nxtb_changes:
             now = i[1]
@@ -171,20 +161,18 @@ class Feed:
 
             title = 'Changed Nextbike bicycle rental name found!'
             timek = strftime("%Y-%m-%dT%H:%M:%S+01:00", localtime())
-            c.execute(
-                ins.format(self.objname, title, timek, fill_template))
+            ins_data = dict(id=None, title=title, data=timek, content=fill_template)
+            c[self.objname + "_FEED"].insert(ins_data)
 
-        connection.commit()
-        connection.close()
+        c.commit()
 
     def create_feed(self):
         from time import localtime, strftime
-        connection = sql.connect(__DB__)
-        c = connection.cursor()
+        c = dataset.connect(DB)
+        base = "{0}_FEED"
 
-        feeds = c.execute(
+        feeds = c.query(
             '''SELECT * FROM {0}_FEED'''.format(self.objname)).fetchall()
-        connection.close()
 
         template = self.envir.get_template("atom.xml")
 
