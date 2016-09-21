@@ -59,14 +59,12 @@ class Feed:
 
             if osm_hist == None:
                 self.osm_new.append(i)
-                print(dict(id=i.iD, version=i.version))
                 ctab.insert(dict(id=i.iD, version=i.version))
             else:
                 if osm_hist["version"] == i.version:
                     baza.remove(int(i.iD))
                 else:
                     self.osm_changes.append(i)
-                    print(dict(id=i.iD, version=i.version))
                     ctab.update(dict(id=i.iD, version=i.version), ['id'])
                     baza.remove(int(i.iD))
 
@@ -82,7 +80,6 @@ class Feed:
         baza = self.detuple(dbaza)
 
         for i in self.places:
-            print(i.num)
             nxtb_hist = ctab.find_one(id=i.num)
 
             if nxtb_hist == None:
@@ -96,10 +93,9 @@ class Feed:
                 else:
                     self.nxtb_changes += [nxtb_hist, i]
                     ctab.update(dict(id=i.num, name=i.name), ['id'])
-                    print("lol {0}".format(i.num))
                     try:
                         baza.remove(int(i.num))
-                    except:##>python nextbike_valid.py -f -a "VETURILO Poland" exp.osm hr202020.html
+                    except:
                         pass
                         #add debug info here
 
