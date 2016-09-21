@@ -86,7 +86,8 @@ class Feed:
                 self.nxtb_new.append(i)
                 ctab.insert(dict(id=i.num, name=i.name))
             else:
-                if i.num == 0 or i.name.startswith('.') or i.name.startswith('@') or i.name == '':
+                if i.num == '0' or i.name.startswith('.') or i.name.startswith('@') or i.name == '':
+                    baza.remove(int(i.num))
                     pass
                 elif nxtb_hist["name"] == i.name:
                     baza.remove(int(i.num))
