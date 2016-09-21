@@ -26,10 +26,10 @@ class Feed:
         c = dataset.connect(DB)
         base = "{0}_FEED"
 
-        db_tables = c.query('''SELECT * FROM sqlite_master''').fetchall()
+        db_tables = c.query('''SELECT name FROM sqlite_master''')#.fetchall()
         tables = []
         for i in db_tables:
-            i = i[1]
+            i = i['name']
             tables.append(i)
         if '{0}_OSM'.format(self.objname) not in tables:
             c.query(
@@ -40,70 +40,75 @@ class Feed:
         if '{0}_FEED'.format(self.objname) not in tables:
             c.query(
                 '''CREATE TABLE {0}_FEED (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, data TEXT, content TEXT)'''.format(self.objname))
-        connection.commit()
+        c.commit()
 
     def detuple(self, lista):
         new_list = []
         for i in lista:
-            new_list.append(i[0])
+            new_list.append(i['id'])
         return new_list
 
     def check_db(self):
         c = dataset.connect(DB)
-        sel = '''SELECT * FROM {0}_OSM WHERE id={1}'''
-
-        dbaza = c.query(
-            '''SELECT id FROM {0}_OSM'''.format(self.objname)).fetchall()
+        ctab = c.load_table("{0}_OSM".format(self.objname))
+        dbaza = ctab.all()
         baza = self.detuple(dbaza)
 
         for i in self.features:
-            osm_hist = c.query(
-                sel.format(self.objname, str(i.iD))).fetchone()
+            osm_hist = ctab.find_one(id=str(i.iD))
 
             if osm_hist == None:
                 self.osm_new.append(i)
-                c[self.objname + "_OSM"].insert(dict(id=i.iD, version=i.version))
+                print(dict(id=i.iD, version=i.version))
+                ctab.insert(dict(id=i.iD, version=i.version))
             else:
-                if osm_hist[1] == i.version:
+                if osm_hist["version"] == i.version:
                     baza.remove(int(i.iD))
                 else:
                     self.osm_changes.append(i)
-                    c[self.objname + "_OSM"].update(dict(id=i.iD, version=i.version))
+                    print(dict(id=i.iD, version=i.version))
+                    ctab.update(dict(id=i.iD, version=i.version), ['id'])
                     baza.remove(int(i.iD))
 
         if baza != []:
             for i in baza:
-                c[self.objname + "_OSM"].delete(id=i)
+                ctab.delete(id=i)
                 self.osm_rem.append(i)
 
         c.commit()
 
-        sel = '''SELECT * FROM {0}_NXTB WHERE id={1}'''
-
-        dbaza = c.query(
-            '''SELECT id FROM {0}_NXTB'''.format(self.objname)).fetchall()
+        ctab = c.load_table("{0}_NXTB".format(self.objname))
+        dbaza = ctab.all()
         baza = self.detuple(dbaza)
+
         for i in self.places:
-            nxtb_hist = c.query(sel.format(self.objname, i.num)).fetchone()
+            print(i.num)
+            nxtb_hist = ctab.find_one(id=i.num)
 
             if nxtb_hist == None:
                 self.nxtb_new.append(i)
-                c[self.objname + "_NXTB"].insert(dict(id=i.num, name=i.name))
+                ctab.insert(dict(id=i.num, name=i.name))
             else:
-                if nxtb_hist[1] == i.name:
+                if i.num == 0 or i.name.startswith('.') or i.name.startswith('@') or i.name == '':
+                    pass
+                elif nxtb_hist["name"] == i.name:
                     baza.remove(int(i.num))
                 else:
                     self.nxtb_changes += [nxtb_hist, i]
-                    c[self.objname + "_NXTB"].update(dict(id=i.num, name=i.name))
-                    baza.remove(int(i.num))
+                    ctab.update(dict(id=i.num, name=i.name), ['id'])
+                    print("lol {0}".format(i.num))
+                    try:
+                        baza.remove(int(i.num))
+                    except:##>python nextbike_valid.py -f -a "VETURILO Poland" exp.osm hr202020.html
+                        pass
+                        #add debug info here
 
         if baza != []:
             for i in baza:
-                c[self.objname + "_NXTB"].delete(id=i)
+                ctab.delete(id=i)
                 self.nxtb_rem.append(i)
 
-        connection.commit()
-        connection.close()
+        c.commit()
 
     def make_feeds(self):
         from time import localtime, strftime
@@ -169,17 +174,15 @@ class Feed:
     def create_feed(self):
         from time import localtime, strftime
         c = dataset.connect(DB)
-        base = "{0}_FEED"
-
-        feeds = c.query(
-            '''SELECT * FROM {0}_FEED'''.format(self.objname)).fetchall()
+        ctab = c.load_table("{0}_FEED".format(self.objname))
+        feeds = ctab.all()
 
         template = self.envir.get_template("atom.xml")
 
         articles = []
         for i in feeds:
             new_entry = {'title': i[
-                1], 'id': "{0}:{1}".format(self.objname, str(i[0])), 'updated': i[2], 'content': i[3]}
+                "title"], 'id': "{0}:{1}".format(self.objname, str(i["id"])), 'updated': i["data"], 'content': i["content"]}
             articles.append(new_entry)
 
         timek = strftime("%Y-%m-%dT%H:%M:%S+01:00", localtime())
