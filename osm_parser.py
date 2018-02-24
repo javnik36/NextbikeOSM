@@ -60,8 +60,8 @@ class osmParser:
         self.path = path
         import xml.etree.ElementTree as XML
 
-        plik = XML.parse(self.path)
-        root = plik.getroot()
+        plik = XML.fromstring(self.path)
+        root = plik#.getroot()
 
         nodes_list = []
         ways_list = []

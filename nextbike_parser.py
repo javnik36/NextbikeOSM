@@ -1,3 +1,5 @@
+import logging
+
 class Place:
 
     def __init__(self, uid, lat, lon, name, num, stands, bike_numbers=None):
@@ -15,9 +17,10 @@ class Place:
 
 class City:
 
-    def __init__(self, uid, name, places=None):
+    def __init__(self, uid, name, bounds, places=None):
         self.uid = uid
         self.name = name
+        self.bounds = bounds
         self.places = []
 
     def __str__(self):
@@ -29,6 +32,16 @@ class City:
 
     def get_uid(self):
         return self.uid
+
+    def get_data(self):
+        import overpass
+
+        api = overpass.API(timeout=600)
+        logging.debug(str(self.bounds))
+
+        dane = api.Get('''node["amenity"="bicycle_rental"]{0};way["amenity"="bicycle_rental"]{0};'''.format(str(self.bounds)),verbosity="body;>;out skel qt",responseformat="xml")
+        #dane = api.Get('''node["amenity"="bicycle_rental"]{0};way["amenity"="bicycle_rental"]{0}'''.format(str(self.bounds),str(self.bounds)),responseformat="xml")
+        return dane
 
 
 class Country:
@@ -48,24 +61,10 @@ class NextbikeParser:
 
     def __init__(self, countrys=None):
         import xml.etree.ElementTree as XML
-        import urllib.request as urllib
-        import os
+        import nosm_utils
 
-        path = "http://nextbike.net/maps/nextbike-official.xml"
-        if "nextbike.xml" in os.listdir():
-            pass
-        else:
-            urllib.urlretrieve(path, "nextbike.xml")
-
-        try:
-            plik = XML.parse("nextbike.xml")
-        except:
-            print("Retrying to parse the data...")
-            urllib.urlretrieve(path, "nextbike.xml")
-            try:
-                plik = XML.parse("nextbike.xml")
-            except:
-                raise SyntaxError("Feed input data bad formed...:/")
+        nosm_utils.refresh_nxtb()
+        plik = XML.parse("nextbike.xml")
         root = plik.getroot()
 
         C_list = []
@@ -82,8 +81,10 @@ class NextbikeParser:
 
                 uid = city.attrib["uid"]
                 name = city.attrib["name"]
-
-                c = City(uid, name)
+                bounds = city.attrib["bounds"]
+                w_bounds = nosm_utils.get_bounds(bounds)
+                logging.debug("Zapisuje współrzędne {0}".format(str(w_bounds)))
+                c = City(uid, name, bounds=w_bounds)
 
                 for place in city:
                     try:
@@ -139,7 +140,8 @@ class NextbikeParser:
         for i in self.countrys:
             for city in i.cities:
                 if city.uid == str(name):
-                    e = city.places
+                    #e = city.places
+                    e = city
                     return e
 
     def check_uids(self, new_uids):

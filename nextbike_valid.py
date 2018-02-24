@@ -1,5 +1,8 @@
 import osm_parser as OP
 import nextbike_parser as NP
+import nosm_utils
+import logging
+logging.basicConfig(filename="nextbike_vaid.log", level=logging.DEBUG, format="%(asctime)s:%(levelname)s:%(funcName)s: %(message)s")
 
 __VERSION__ = '2.0.2'
 
@@ -175,16 +178,19 @@ if __name__ == "__main__":
         a = NP.NextbikeParser()
         a.get_uids()
     if args.auto:
-        a = OP.osmParser(args.auto[1])
+        b = NP.NextbikeParser()
+        if args.auto[0].isnumeric():
+            d = b.find_city(args.auto[0])
+            dane = d.get_data()
+            d = d.places
+        else:
+            d = b.find_network(args.auto[0])
+
+        a = OP.osmParser(dane)
         a.fill_ways()
         a.clear_nodes()
         a.fake_all()
-        b = NP.NextbikeParser()
         c = NextbikeValidator(b, a)
-        if args.auto[0].isnumeric():
-            d = b.find_city(args.auto[0])
-        else:
-            d = b.find_network(args.auto[0])
         c.is_whatever(args.auto[2])
         c.pair(d)
         if args.feed:
