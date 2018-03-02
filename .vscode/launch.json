@@ -5,14 +5,34 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python",
+            "name": "Test on small City",
             "type": "python",
             "request": "launch",
             "stopOnEntry": true,
             "pythonPath": "${config:python.pythonPath}",
-            "program": "nextbike_valid.py",
+            "program": "${workspaceFolder}/nextbike_valid.py",
+            "args": [
+                "-a","210","export.osm","t1.html"
+            ],
             "cwd": "${workspaceFolder}",
-            "env": {"-a":"372,export.osm,t1.html"},
+            "env": {},
+            "envFile": "${workspaceFolder}/.env",
+            "debugOptions": [
+                "RedirectOutput"
+            ]
+        },
+        {
+            "name": "Update UIDs and Source for Nextbike",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "pythonPath": "${config:python.pythonPath}",
+            "program": "${workspaceFolder}/nextbike_valid.py",
+            "args": [
+                "-u"
+            ],
+            "cwd": "${workspaceFolder}",
+            "env": {},
             "envFile": "${workspaceFolder}/.env",
             "debugOptions": [
                 "RedirectOutput"

@@ -2,7 +2,7 @@ import osm_parser as OP
 import nextbike_parser as NP
 import nosm_utils
 import logging
-logging.basicConfig(filename="nextbike_vaid.log", level=logging.DEBUG, format="%(asctime)s:%(levelname)s:%(funcName)s: %(message)s")
+logging.basicConfig(filename="nextbike_valid.log", level=logging.DEBUG, format="%(asctime)s:%(levelname)s:%(funcName)s: %(message)s",filemode="w")
 
 __VERSION__ = '2.0.2'
 

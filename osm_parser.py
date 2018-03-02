@@ -36,7 +36,7 @@ class Way:
         return 'way'
 
     def fake_it(self):
-        #nodes = [  (y,x)  ]
+        # nodes = [  (y,x)  ]
         count = 0
         y_count = 0
         x_count = 0
@@ -79,7 +79,7 @@ class osmParser:
                     user = child.attrib["user"]
                     time = child.attrib["timestamp"]
                 except:
-                    #print("No version data")
+                    # print("No version data")
                     pass
                 tags = {}
 

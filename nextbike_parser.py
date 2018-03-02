@@ -26,6 +26,9 @@ class City:
     def __str__(self):
         return "#" + str(self.uid) + " @" + self.name + " with " + str(len(self.places)) + " places."
 
+    def return_self(self):
+        return self
+
     def get(self, nr):
         if self.uid == nr:
             return self.places
@@ -37,10 +40,13 @@ class City:
         import overpass
 
         api = overpass.API(timeout=600)
-        logging.debug(str(self.bounds))
+        logging.debug("Pobieram dane dla granic..." + str(self.bounds))
 
-        dane = api.Get('''node["amenity"="bicycle_rental"]{0};way["amenity"="bicycle_rental"]{0};'''.format(str(self.bounds)),verbosity="body;>;out skel qt",responseformat="xml")
-        #dane = api.Get('''node["amenity"="bicycle_rental"]{0};way["amenity"="bicycle_rental"]{0}'''.format(str(self.bounds),str(self.bounds)),responseformat="xml")
+        dane = api.Get('''(node["amenity"="bicycle_rental"]{0};way["amenity"="bicycle_rental"]{0};);'''.format(str(self.bounds)), verbosity="body;>;out skel qt", responseformat="xml")
+        # logging.debug('''Użyto linku: (..)/node["amenity"="bicycle_rental"]{0};way["amenity"="bicycle_rental"]{0};'''.format(str(self.bounds).replace(" ", "")) + "body;>;out skel qt")
+        with open("export.osm", 'w', encoding="utf-8") as file:
+            file.write(dane)
+
         return dane
 
 
@@ -141,7 +147,7 @@ class NextbikeParser:
             for city in i.cities:
                 if city.uid == str(name):
                     #e = city.places
-                    e = city
+                    e = city.return_self()
                     return e
 
     def check_uids(self, new_uids):

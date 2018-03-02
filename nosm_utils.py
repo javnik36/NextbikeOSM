@@ -11,9 +11,21 @@ def refresh_nxtb():
     import xml.etree.ElementTree as XML
     import urllib.request as urllib
     import os
+    import time
 
     path="http://nextbike.net/maps/nextbike-official.xml"
-    if "nextbike.xml" in os.listdir():
+    try:
+        mod_time = time.localtime(os.path.getmtime("nextbike.xml"))
+        now = time.localtime()
+        if mod_time[2] == now[2]:
+            is_same = True # Sprawdza czy dzień modyfikacji ten sam
+        else:
+            is_same = False
+    except:
+        is_same = False
+        logging.debug("Nie można odczytać daty ostatniej modyfikacji pliku nextbike.xml")
+
+    if "nextbike.xml" in os.listdir() and is_same:
         logging.info("Znaleziono plik nextbike.xml")
     else:
         logging.info("Nie znaleziono pliku nextbike.xml, próbuję pobrać...")
@@ -48,4 +60,3 @@ def get_bounds(bounds):
     logging.info("Skonwertowano współrzędne miasta")
     logging.debug("{0},{1},{2},{3}".format(str(d),str(l),str(g),str(p)))
     return (d,l,g,p)
-
